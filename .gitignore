@@ -21,6 +21,7 @@
 *.dylib
 
 # Executables
+/webserver/tinyum
 *.exe
 *.out
 *.app
