@@ -1,0 +1,16 @@
+Chapitre 3.2 : TCP
+
+1. Il y a une erreur qui apparaît cette erreur est dû à la fonction bind car quand on relance le serveur l'interface réseau est déjà en cours d'éxécution.
+L'erreur dîte est : "Bind error: Address already in use
+Connection refused: Socket operation on non-socket"
+
+2. Le serveur s'arrete 1 seconde après la deconnection du client.
+
+3. Telnet n'arrive pas a atteindre l'hôte car la connection est refusée.
+Error : Trying ::1...
+telnet: Unable to connect to remote host: Connection refused
+
+4. Le premier client se connecte correctement avec le message qui s'affiche à l'écran mais le deuxième client reste bloqué après la commande netcat 127.0.0.1 8080. Une connection est acceptée pour l'instant.
+
+
+
