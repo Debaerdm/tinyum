@@ -1,4 +1,8 @@
+0.2:
+    - Restarting
+
 0.1:
-	- Add server
+    - Add server
     - First release
     - Setting up
+    - Add mono connection
