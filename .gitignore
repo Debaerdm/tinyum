@@ -87,7 +87,7 @@ CMakeFiles
 CMakeScripts
 
 # Mafile
-Makefile
+*.dep
 cmake_install.cmake
 install_manifest.txt
 
