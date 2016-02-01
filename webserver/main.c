@@ -6,7 +6,7 @@
 #include <sys/types.h> 
 #include <sys/socket.h>
 
-#define BUFFER_SIZE 1024
+#define BUFFER_SIZE 80
 
 int main(void)
 {
@@ -21,6 +21,7 @@ int main(void)
     }
 
     const char *message = "Welcome to tinyum, tinyum is a server for TCP connection\n";
+    sleep(1);
     if (write(socket_client, message, strlen(message)) == -1) {
 	perror("write");
 	return EXIT_FAILURE;
@@ -30,17 +31,20 @@ int main(void)
     int n;
     for ( ; ; ) {
 
+        /* clean the current buffer */
+        memset(buf, '\0', BUFFER_SIZE);
+
 	if ((n = read(socket_client, buf, BUFFER_SIZE - 1)) == -1) {
 	    perror("read");
 	    return EXIT_FAILURE;
 	}
 
-	buf[BUFFER_SIZE -1] = '\0';
+	buf[BUFFER_SIZE - 1] = '\0';
 	printf("%s", buf);
 	write(socket_client, buf, n);
 
 	/* clean the current buffer */
-	memset(buf, '\0', BUFFER_SIZE);
+        //memset(buf, '\0', BUFFER_SIZE);
     }
 
     close(socket_server);
