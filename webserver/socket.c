@@ -23,6 +23,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <stdio.h>
+#include <signal.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netinet/ip.h> 
@@ -56,4 +57,10 @@ int create_server(int port)
     }
     
     return socket_server;
+}
+
+void initialize_signals(void) {
+    if (signal(SIGPIPE, SIG_IGN) == SIG_ERR) {
+	perror("signal");
+    }
 }
