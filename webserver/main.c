@@ -1,11 +1,15 @@
 #include <stdio.h>
-#include <string.h>
-int main(int argc, char **argv)
+#include "socket.h"
+#include <sys/types.h> 
+#include <sys/socket.h>
+
+int main(void)
 {
-    if(argc > 1 && strcmp(argv[1], "-advice") == 0){
-        printf("Don’t Panic !\n");
-        return 42;
+    int socket_serveur = create_server(8080); 
+    char *message = "Welcome to tinyum, tinyum is a server for TCP connection\n";
+    if(accept(socket_serveur, NULL, NULL) == -1){
+        perror("Connection refused");
+        return EXIT_FAILURE;
     }
-    printf("Need an advice ?\n");
-    return 0;
+    return EXIT_SUCCESS;
 }

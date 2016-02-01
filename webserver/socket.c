@@ -4,10 +4,10 @@
 #include <netinet/in.h>
 #include <netinet/ip.h> 
 
-int serveur(void){
+int create_server(int port){
     struct sockaddr_in saddr;
     saddr.sin_family = AF_INET;
-    saddr.sin_port = htons(8080);
+    saddr.sin_port = htons(port);
     saddr.sin_addr.s_addr = INADDR_ANY;
     int socket_serveur;
 
@@ -24,5 +24,5 @@ int serveur(void){
         return EXIT_FAILURE;
     }
     
-    return EXIT_SUCCESS;
+    return socket_serveur;
 }
