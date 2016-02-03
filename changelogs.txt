@@ -1,3 +1,6 @@
+0.4:
+	- Handling zombies process
+
 0.3:
 	- Management signals
 	- Management of simultaneous connection
