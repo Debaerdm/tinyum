@@ -58,9 +58,3 @@ int create_server(int port)
     
     return socket_server;
 }
-
-void initialize_signals(void) {
-    if (signal(SIGPIPE, SIG_IGN) == SIG_ERR) {
-	perror("signal");
-    }
-}
