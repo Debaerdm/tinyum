@@ -27,6 +27,7 @@
 #include <sys/types.h> 
 #include <sys/socket.h>
 #include <sys/wait.h>
+#include <setjmp.h>
 #include "socket.h"
 
 
@@ -35,10 +36,12 @@
 int main(void)
 {
 
+    initialize_signals();
+    
     int socket_server;
     if ((socket_server = create_server(8080)) == -1) return EXIT_FAILURE;
 
-    for( ; ; ){
+    for( ; ; ) {
         int socket_client;
         if ((socket_client = accept(socket_server, NULL, NULL)) == -1) {
             perror("Connection refused");
@@ -46,18 +49,20 @@ int main(void)
         }
 
         pid_t pid;
-        if((pid = fork()) == -1){
+        if((pid = fork()) == -1) {
             perror("fork");
             return EXIT_FAILURE;
         }
 
-        if(pid == 0){
-            initialize_signals();
+        if(pid == 0) {
+	    
             const char *message = "Welcome to tinyum, tinyum is a server for TCP connection\n";
+	    
             if (write(socket_client, message, strlen(message)) == -1) {
                 perror("write");
                 return EXIT_FAILURE;
             }
+	    
             char buf[BUFFER_SIZE];
             int n;
             for (;;) {
@@ -73,15 +78,12 @@ int main(void)
                 buf[BUFFER_SIZE -1] = '\0';
                 printf("%s", buf);
                 write(socket_client, buf, n);
-
             }
-
         }
         else
-            close(socket_client);
-        /*int status;
-        (void)waitpid(pid, &status, 0);*/
+	    close(socket_client);
     }
+
     close(socket_server);
 
     return EXIT_SUCCESS;
