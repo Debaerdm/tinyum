@@ -1,3 +1,7 @@
+0.3:
+	- Management signals
+	- Management of simultaneous connection
+
 0.2:
     - Restarting
 
