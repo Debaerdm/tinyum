@@ -81,7 +81,6 @@ int main(void)
             }
         }
         else
-	    close(socket_client);
     }
 
     close(socket_server);
