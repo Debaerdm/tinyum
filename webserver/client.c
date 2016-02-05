@@ -78,7 +78,7 @@ int main(void)
 	    /* Clean the buffer stream */
 	    memset(buf, 0, sizeof(buf));
 	    while ((read_size = fgets(buf, sizeof(buf), tinyum)) != NULL){
-		fprintf(tinyum, "<Tinyum> %s", buf);
+		printf("%s", buf);
 		memset(buf, 0, sizeof(buf));
 	    }
 	    if(read_size == NULL){
