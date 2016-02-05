@@ -1,6 +1,6 @@
 CC=gcc
 LD=gcc
-CFLAGS=-Wall -W -Werror -Wwrite-strings
+CFLAGS=-Wall -W -Werror -Wwrite-strings -g
 LDFLAGS=
 EXE=tinyum
 HEADERS=$(wildcard *.h)
