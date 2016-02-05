@@ -1,3 +1,16 @@
+Chapitre 5.2 : Requête GET
+
+3. Le message envoyer par le client est :
+
+	GET / HTTP/1.1
+	Host: localhost:8080
+	User-Agent: curl/7.47.0
+	Accept: */*
+4.
+	- La methode GET sert a demander une ressource.
+	- Le champ Host nous donnes les informations l'adresse et le port de la ressource demandée
+	- Le champ User-Agent contient les informations sur l'application utilisateur qui a demandée la ressources (i.e Navigateur)
+
 Chapitre 3.2 : TCP
 
 1. Il y a une erreur qui apparaît cette erreur est dû à la fonction bind car quand on relance le serveur l'interface réseau est déjà en cours d'éxécution.
