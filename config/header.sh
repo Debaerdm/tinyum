@@ -6,12 +6,14 @@ des=$2
 mail=$3
 year=$(date +'%Y')
 fullname=$(getent passwd $USER | cut -d ':' -f 5)
+copyright="Copyright (C) $year $fullname $mail"
 
-echo "/*
+header="
+*
 * $path
 * $des
 *
-* Copyright (C) $year $fullname $mail
+* $copyright 
 *
 * This program is free software; you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -27,6 +29,21 @@ echo "/*
 * You should have received a copy of the GNU General Public License
 * along with this program; if not, write to the Free Software
 * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-*/
-" | cat - $1 > /tmp/temp && mv /tmp/temp $1
+*
+"
+
+if [[ -e $1 ]]; then
+		tmp=$(cat $1 | grep "Copyright" | wc -l)
+		line=$(cat $1 | grep -n "Copyright" | head -n 1 | cut -d ':' -f 1)
+		echo `expr $line + $tmp`
+		#sed -i '$calul\ 
+		#$copyright\
+		#			' $1
+else
+		touch $1 ; echo "/$header/" | cat - $1 > /tmp/temp && mv /tmp/temp $1
+fi
+
+
+#| cat - $1 > /tmp/temp && mv /tmp/temp $1
+
 

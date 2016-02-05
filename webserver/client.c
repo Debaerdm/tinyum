@@ -28,62 +28,72 @@
 #include <sys/socket.h>
 #include <sys/wait.h>
 #include <setjmp.h>
+#include "signals.h"
 #include "socket.h"
 
 
 #define BUFFER_SIZE 1024
 
+
 int main(void)
 {
+		int socket_client, socket_server;
+		if ((socket_server = create_server(8080)) == -1) return EXIT_FAILURE;
 
-    initialize_signals();
-    
-    int socket_server;
-    if ((socket_server = create_server(8080)) == -1) return EXIT_FAILURE;
+		initialize_signals();
 
-    for( ; ; ) {
-        int socket_client;
-        if ((socket_client = accept(socket_server, NULL, NULL)) == -1) {
-            perror("Connection refused");
-            return EXIT_FAILURE;
-        }
+		for (;;) {
+				if ((socket_client = accept(socket_server, NULL, NULL)) == -1) {
+						perror("Connection refused");
+						return EXIT_FAILURE;
+				}
 
-        pid_t pid;
-        if((pid = fork()) == -1) {
-            perror("fork");
-            return EXIT_FAILURE;
-        }
+				puts("Client connected");
 
-        if(pid == 0) {
-	    
-            const char *message = "Welcome to tinyum, tinyum is a server for TCP connection\n";
-	    
-            if (write(socket_client, message, strlen(message)) == -1) {
-                perror("write");
-                return EXIT_FAILURE;
-            }
-	    
-            char buf[BUFFER_SIZE];
-            int n;
-            for (;;) {
+				pid_t pid;
+				if ((pid = fork()) == -1) {
+						perror("fork");
+						return EXIT_FAILURE;
+				}
 
-                /* clean the current buffer */
-                memset(buf, 0, BUFFER_SIZE);
 
-                if ((n = read(socket_client, buf, BUFFER_SIZE - 1)) == -1) {
-                    perror("read");
-                    return EXIT_FAILURE;
-                }
+				if (pid == 0) {
 
-                buf[BUFFER_SIZE -1] = '\0';
-                printf("%s", buf);
-                write(socket_client, buf, n);
-            }
-        }
-        else
-    }
+						const char *message = "Welcome to tinyum, tinyum is a server for TCP connection\n";
 
-    close(socket_server);
+						if (write(socket_client, message, strlen(message)) == -1) {
+								perror("write");
+								return EXIT_FAILURE;
+						}
 
-    return EXIT_SUCCESS;
+						char buf[BUFFER_SIZE];
+						int read_size;
+
+						/* Clean the buffer stream */
+						memset(buf, 0, BUFFER_SIZE);
+						while ((read_size = recv(socket_client, buf, BUFFER_SIZE, 0)) > 0) {
+								write(socket_client, buf, BUFFER_SIZE);
+								memset(buf, 0, BUFFER_SIZE);
+						}
+	
+						switch (read_size){
+							case 0:
+									puts("Client disconnected");
+									fflush(stdout);
+									break;
+							case -1:
+									perror("recv");
+									return EXIT_FAILURE;
+						}
+
+						close(socket_client);
+						return EXIT_SUCCESS;
+				} else {
+						close(socket_client);
+				}
+		}
+
+		close(socket_server);
+
+		return EXIT_SUCCESS;
 }
