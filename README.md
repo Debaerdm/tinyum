@@ -1,4 +1,4 @@
-# tinyum HTTP web server
+# tinyum HTTP web server  [![Build Status](https://travis-ci.org/cboin/tinyum.svg?branch=master)](https://travis-ci.org/cboin/tinyum)
 The tinyum web server is a powerful and flexible HTTP/1.1 compliant web server
 
 ## Documentation
