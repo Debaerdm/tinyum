@@ -7,4 +7,4 @@ compiler:
         - gcc
         - clang
 
-build: make
+script: make
