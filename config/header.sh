@@ -36,9 +36,9 @@ if [[ -e $1 ]]; then
 		tmp=$(cat $1 | grep "Copyright" | wc -l)
 		line=$(cat $1 | grep -n "Copyright" | head -n 1 | cut -d ':' -f 1)
 		echo `expr $line + $tmp`
-		#sed -i '$calul\ 
-		#$copyright\
-		#			' $1
+		if [ $(echo `expr $line $tmp`) == 0 ] ; then
+				touch $1 ; echo "/$header/" | cat - $1 > /tmp/temp && mv /tmp/temp $1
+		fi
 else
 		touch $1 ; echo "/$header/" | cat - $1 > /tmp/temp && mv /tmp/temp $1
 fi

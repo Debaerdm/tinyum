@@ -30,7 +30,7 @@ void handler(int sig)
     pid_t pid;
     int status;
     
-    while ((pid = waitpid(-1, &status, WNOHANG)) > 0)
+    if((pid = waitpid(-1, &status, WNOHANG)) > 0)
         printf("Signal %d recivied\n", sig);
 }
 
