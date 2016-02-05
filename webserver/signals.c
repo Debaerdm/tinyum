@@ -30,7 +30,7 @@ void handler(int sig)
     pid_t pid;
     int status;
     
-    if((pid = waitpid(-1, &status, WNOHANG)) > 0)
+    if ((pid = waitpid(-1, &status, WNOHANG)) > 0)
         printf("Signal %d recivied\n", sig);
 }
 
@@ -40,6 +40,7 @@ void initialize_signals(void)
 
     sa.sa_handler = handler;
     sigemptyset(&sa.sa_mask);
+	sa.sa_flags = SA_RESTART;
 
     if (sigaction(SIGCHLD, &sa, NULL) == -1) {
         perror("sigaction");
