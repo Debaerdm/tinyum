@@ -37,65 +37,64 @@
 
 int main(void)
 {
-		int socket_client, socket_server;
-		if ((socket_server = create_server(8080)) == -1) return EXIT_FAILURE;
+    int socket_client, socket_server;
+    if ((socket_server = create_server(8080)) == -1) return EXIT_FAILURE;
 
-		initialize_signals();
+    initialize_signals();
 
-		for (;;) {
-				if ((socket_client = accept(socket_server, NULL, NULL)) == -1) {
-						perror("Connection refused");
-						return EXIT_FAILURE;
-				}
+    for (;;) {
+	if ((socket_client = accept(socket_server, NULL, NULL)) == -1) {
+	    perror("Connection refused");
+	    return EXIT_FAILURE;
+	}
 
-				puts("Client connected");
+	puts("Client connected");
 
-			   FILE *tinyum;
-			   if ((tinyum = fdopen(socket_client, "w+")) == NULL){
-					perror("fdopen");
-					return EXIT_FAILURE;
-			   }
+	FILE *tinyum;
+	if ((tinyum = fdopen(socket_client, "w+")) == NULL){
+	    perror("fdopen");
+	    return EXIT_FAILURE;
+	}
 
-				pid_t pid;
-				if ((pid = fork()) == -1) {
-						perror("fork");
-						return EXIT_FAILURE;
-				}
+	pid_t pid;
+	if ((pid = fork()) == -1) {
+	    perror("fork");
+	    return EXIT_FAILURE;
+	}
 
 
-				if (pid == 0) {
+	if (pid == 0) {
 
-						const char *message = "Welcome to tinyum, tinyum is a server for TCP connection\n";
+	    const char *message = "Welcome to tinyum, tinyum is a server for TCP connection\n";
 
-						if (fwrite(message, strlen(message) + 1, 1, tinyum) == 0) {
-								perror("fwrite");
-								return EXIT_FAILURE;
-						}
-						//fseek(tinyum, SEEK_SET,0);
-						char buf[BUFFER_SIZE];
-						char *read_size;
+	    if (fwrite(message, strlen(message) + 1, 1, tinyum) == 0) {
+		perror("fwrite");
+		return EXIT_FAILURE;
+	    }
+	    //fseek(tinyum, SEEK_SET,0);
+	    char buf[BUFFER_SIZE];
+	    char *read_size;
 
-						/* Clean the buffer stream */
-						memset(buf, 0, BUFFER_SIZE);
-						while ((read_size = fgets(buf, BUFFER_SIZE, tinyum)) != NULL){
-								if ((fwrite(buf, 1, sizeof(buf), tinyum)) > 0)
-									fprintf(tinyum, "<Tinyum> %s", buf);
-								memset(buf, 0, BUFFER_SIZE);
-						}
-						if(read_size == NULL){
-							perror("fgets");
-							return EXIT_FAILURE;
-						}
+	    /* Clean the buffer stream */
+	    memset(buf, 0, sizeof(buf));
+	    while ((read_size = fgets(buf, sizeof(buf), tinyum)) != NULL){
+		fprintf(tinyum, "<Tinyum> %s", buf);
+		memset(buf, 0, sizeof(buf));
+	    }
+	    if(read_size == NULL){
+		perror("fgets");
+		return EXIT_FAILURE;
+	    }
 
-						fclose(tinyum);
-						close(socket_client);
-						return EXIT_SUCCESS;
-				} else {
-						close(socket_client);
-				}
-		}
+	    fclose(tinyum);
+	    close(socket_client);
+	    return EXIT_SUCCESS;
+	} else {
+	    close(socket_client);
+	}
+    }
 
-		close(socket_server);
+    close(socket_server);
 
-		return EXIT_SUCCESS;
+    return EXIT_SUCCESS;
 }
