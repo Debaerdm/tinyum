@@ -1,8 +1,9 @@
+- [X] Parse http request
 - [X] Automatic generation of documentation
 - [V] Restarting
 - [V] Management reports
 - [V] Multi connections
-- [~] Zombies process
+- [V] Zombies process
 - [V] LISENCE
 - [V] .gitingore
 - [V] AUHTORS
