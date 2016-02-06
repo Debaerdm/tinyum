@@ -1,14 +1,17 @@
 #include <string.h>
 #include <ctype.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include "http_request.h"
 
 #define CR '\n'
 #define LF '\r'
-#define HT '\t'
 #define OUT 0
 #define IN 1
 
+/*
+ * Keeps the term that we have treated
+ */
 enum state
 {
      s_start,
@@ -16,9 +19,8 @@ enum state
      s_uri,
      s_first_http_major,
      s_http_major,
-     s_first_http_minor,
-     s_fist_minor,
-     s_header_done
+     s_http_minor,
+     s_header_done,
 };
 
 /*
@@ -49,21 +51,25 @@ int words(const char* s)
  */
 void read_requesthdrs(const char* line, http_request *r)
 {
-     int index, current_state = s_start;
+     int index = 0, current_state = s_start;
      char ch;
      while (current_state != s_header_done) {
      
 	  switch (current_state) {
 	  
 	  case s_start:
-	       if (words(line) != 3)
+	       if (words(line) != 3) {
 		    r->m = HTTP_INVALID;
-	       else 
+		    current_state = s_header_done;
+	       } else { 
 		    current_state = s_method;
+	       }
+	       
+	       break;
 	       
 	  case s_method:
-	       index = 0;
 	       ch = line[index];
+	       /* HTTP Method */
 	       switch (ch) {
 	       case 'O': r->m = HTTP_OPTIONS; index = 7; break;
 	       case 'G': r->m = HTTP_GET; index = 3; break;
@@ -86,7 +92,52 @@ void read_requesthdrs(const char* line, http_request *r)
 	       }
 	       
 	       index += 1;
-	       current_state = s_header_done;
+	       current_state = s_uri;
+	       
+	       break;
+	       
+	  case s_uri:
+	       /* Avoid uri */
+	       while (line[index++] != ' ')
+	       
+	       current_state = s_first_http_major;
+	       break;
+
+	  case s_first_http_major:
+	       if (strncmp("HTTP/", (line + index), 5) == 0) {
+		    index += 5;
+		    current_state = s_http_major;
+	       } else {
+		    r->m = HTTP_INVALID;
+		    current_state = s_header_done;
+	       }
+	       
+	       break;
+	       
+	  case s_http_major:
+	       if (isnumber(line[index])) {
+		    r->major_version = atoi(&line[index]);
+		    index += 2;
+		    current_state = s_http_minor;
+	       } else {
+		    r->m = HTTP_INVALID;
+		    current_state = s_header_done;
+	       }
+
+	       break;
+
+	  case s_http_minor:
+	       if (isnumber(line[index])) {
+		    r->minor_version = atoi(&line[index]);
+		    while (line[index++] != ' ');
+		    current_state = s_header_done;
+	       } else {
+		    r->m = HTTP_INVALID;
+		    current_state = s_header_done;
+	       }
+
+	       break;
+	       
 	  }
      }
 }
