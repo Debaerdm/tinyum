@@ -18,3 +18,5 @@ typedef struct {
      char* uri;
 } http_request;
      
+
+int read_http_request(const char*, http_request *);

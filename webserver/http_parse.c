@@ -1,5 +1,6 @@
 #include <string.h>
 #include <ctype.h>
+#include <stdlib.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include "http_request.h"
@@ -44,23 +45,25 @@ int words(const char* s)
      }
 
      return index;
-}	  
+}
 
 /*
  * read_requesthdrs - read and parse HTTP request headers
  */
-void read_requesthdrs(const char* line, http_request *r)
+int read_http_request(const char* line, http_request *r)
 {
      int index = 0, current_state = s_start;
      char ch;
      while (current_state != s_header_done) {
      
 	  switch (current_state) {
-	  
+	   
 	  case s_start:
+	    
 	       if (words(line) != 3) {
 		    r->m = HTTP_INVALID;
 		    current_state = s_header_done;
+		    return EXIT_FAILURE;
 	       } else { 
 		    current_state = s_method;
 	       }
@@ -110,6 +113,7 @@ void read_requesthdrs(const char* line, http_request *r)
 	       } else {
 		    r->m = HTTP_INVALID;
 		    current_state = s_header_done;
+		    return EXIT_FAILURE;
 	       }
 	       
 	       break;
@@ -122,6 +126,7 @@ void read_requesthdrs(const char* line, http_request *r)
 	       } else {
 		    r->m = HTTP_INVALID;
 		    current_state = s_header_done;
+		    return EXIT_FAILURE;
 	       }
 
 	       break;
@@ -134,10 +139,13 @@ void read_requesthdrs(const char* line, http_request *r)
 	       } else {
 		    r->m = HTTP_INVALID;
 		    current_state = s_header_done;
+		    return EXIT_FAILURE;
 	       }
 
 	       break;
 	       
 	  }
      }
+
+     return EXIT_SUCCESS;
 }
