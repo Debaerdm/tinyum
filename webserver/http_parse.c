@@ -115,7 +115,7 @@ void read_requesthdrs(const char* line, http_request *r)
 	       break;
 	       
 	  case s_http_major:
-	       if (isnumber(line[index])) {
+	       if (isdigit(line[index])) {
 		    r->major_version = atoi(&line[index]);
 		    index += 2;
 		    current_state = s_http_minor;
@@ -127,7 +127,7 @@ void read_requesthdrs(const char* line, http_request *r)
 	       break;
 
 	  case s_http_minor:
-	       if (isnumber(line[index])) {
+	       if (isdigit(line[index])) {
 		    r->minor_version = atoi(&line[index]);
 		    while (line[index++] != ' ');
 		    current_state = s_header_done;
