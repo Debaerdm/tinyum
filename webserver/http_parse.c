@@ -14,7 +14,7 @@
  * Keeps the term that we have treated
  */
 enum state
-{
+  {
     s_start,
     s_method,
     s_space_before_uri,
@@ -29,46 +29,44 @@ enum state
     s_http_first_minor_version,
     s_http_minor_version,
     s_header_done,
-};
+  };
 
 /*
  * words - return numbers of words in string
  */
 int words(const char* s)
 {
-    unsigned int index = 0;
-    const char *ch = s;
-    int state = OUT;
+  unsigned int index = 0;
+  const char *ch = s;
+  int state = OUT;
 
-    while (*ch) {
-        if (isspace(*ch))
-            state = OUT;
-        else if (state == OUT) {
-            state = IN;
-            ++index;
-        }
-
-        ++ch;
+  while (*ch) {
+    if (isspace(*ch))
+      state = OUT;
+    else if (state == OUT) {
+      state = IN;
+      ++index;
     }
 
-    return index;
-}
+    ++ch;
+  }
 
-int append(char* s, size_t size, char c) {
-     if(strlen(s) + 1 >= size)
-       return EXIT_FAILURE;
-     
-     int len = strlen(s);
-     s[len] = c;
-     s[len+1] = '\0';
-     
-     return EXIT_SUCCESS;
+  return index;
 }
 
 /*
- * read_http {
- * while
+ * append - Appends the string representation of the char argument to this sequence. 
  */
+int append(char* s, size_t size, char c) {
+  if(strlen(s) + 1 >= size)
+    return EXIT_FAILURE;
+     
+  int len = strlen(s);
+  s[len] = c;
+  s[len+1] = '\0';
+     
+  return EXIT_SUCCESS;
+}
 
 /*
  * read_requesthdrs - read and parse HTTP request headers
@@ -277,21 +275,21 @@ int read_http_request(const char* line, http_request *r)
       current_state = s_http_minor_version;
       break;
 
+    case s_http_minor_version:
+      if (ch == CR) {
+	printf("FINI");
+	current_state = s_header_done;
+	break;
+      }
+
+      if (ch == LF) {
+	printf("FINI");
+	current_state = s_header_done;
+	break;
+      }
     }
 
   }
     
   return EXIT_SUCCESS;
-}
-
-int main (void) {
-
-  http_request r;
-  read_http_request("GET /index.php HTTP/1.1\r\n", &r);
-  if (r.m == HTTP_GET)
-    printf("GET\n");
-
-  printf("%s\n", r.uri);
-  printf("%d\n", r.major_version);
-  return 0;
 }
