@@ -52,6 +52,17 @@ int words(const char* s)
     return index;
 }
 
+int append(char* s, size_t size, char c) {
+     if(strlen(s) + 1 >= size)
+       return EXIT_FAILURE;
+     
+     int len = strlen(s);
+     s[len] = c;
+     s[len+1] = '\0';
+     
+     return EXIT_SUCCESS;
+}
+
 /*
  * read_http {
  * while
@@ -64,6 +75,8 @@ int read_http_request(const char* line, http_request *r)
 {
     int pos, last = strlen(line), current_state = s_start;
     char ch;
+    char s[strlen(line)];
+    memset(s, 0, strlen(line));
 
     for (pos = 0; pos < last; ++pos) {
       ch = line[pos];
@@ -97,33 +110,39 @@ int read_http_request(const char* line, http_request *r)
 	  case 3:
 	    if (strncmp(line, "GET", 3) == 0) {
 	      r->m = HTTP_GET;
+	      current_state = s_uri;
 	      break;
 	    }
 
 	    if (strncmp(line, "PUT", 3) == 0) {
+	      current_state = s_uri;
 	      r->m = HTTP_PUT;
 	      break;
 	    }
 
 	  case 4:
 	    if (strncmp(line, "HEAD", 4) == 0) {
+	      current_state = s_uri;
 	      r->m = HTTP_HEAD;
 	      break;
 	    }
 
 	    if (strncmp(line, "POST", 4) == 0) {
+	      current_state = s_uri;
 	      r->m = HTTP_POST;
 	      break;
 	    }
 
 	  case 5:
 	    if (strncmp(line, "TRACE", 5) == 0) {
+	      current_state = s_uri;
 	      r->m = HTTP_TRACE;
 	      break;
 	    }
 
 	  case 6:
 	    if (strncmp(line, "DELETE", 6) == 0) {
+	      current_state = s_uri;
 	      r->m = HTTP_DELETE;
 	      break;
 	    }
@@ -138,15 +157,21 @@ int read_http_request(const char* line, http_request *r)
 	      r->m = HTTP_OPTIONS;
 	      break;
 	    }
-
-	    current_state = s_uri;
 	  }
 	}
 
 	break;
 
+      case s_uri:
+	if (ch == ' ') {
+	  strcpy(r->uri, s);
+	  current_state = s_http_H;
+	  break;
+	} else {
+	  append(s, strlen(line), ch);
+	}	 
       }
-      /* TODO URI */
+
     }
     
     return EXIT_SUCCESS;
@@ -155,8 +180,10 @@ int read_http_request(const char* line, http_request *r)
 int main (void) {
 
   http_request r;
-  read_http_request("GET / HTTP/1.1\n\r", &r);
+  read_http_request("GET /index.php HTTP/1.1\r\n", &r);
   if (r.m == HTTP_GET)
     printf("GET\n");
+
+  printf("%s\n", r.uri);
   return 0;
 }
