@@ -22,6 +22,7 @@ enum state
      s_http_major,
      s_http_minor,
      s_header_done,
+     s_end_request,
 };
 
 /*
@@ -48,6 +49,11 @@ int words(const char* s)
 }
 
 /*
+ * read_http {
+ * while
+ */
+
+/*
  * read_requesthdrs - read and parse HTTP request headers
  */
 int read_http_request(const char* line, http_request *r)
@@ -63,9 +69,11 @@ int read_http_request(const char* line, http_request *r)
 	       if (words(line) != 3) {
 		    r->m = HTTP_INVALID;
 		    current_state = s_header_done;
+		    printf("Invalid\n");
 		    return EXIT_FAILURE;
 	       } else { 
 		    current_state = s_method;
+		    printf("Start\n");
 	       }
 	       
 	       break;
@@ -95,6 +103,7 @@ int read_http_request(const char* line, http_request *r)
 	       }
 	       
 	       index += 1;
+	       printf("Method\n");
 	       current_state = s_uri;
 	       
 	       break;
@@ -102,13 +111,15 @@ int read_http_request(const char* line, http_request *r)
 	  case s_uri:
 	       /* Avoid uri */
 	       while (line[index++] != ' ')
-	       
+		 ;
+	       printf("uri\n");
 	       current_state = s_first_http_major;
 	       break;
 
 	  case s_first_http_major:
 	       if (strncmp("HTTP/", (line + index), 5) == 0) {
 		    index += 5;
+		    printf("major\n");
 		    current_state = s_http_major;
 	       } else {
 		    r->m = HTTP_INVALID;
@@ -122,6 +133,7 @@ int read_http_request(const char* line, http_request *r)
 	       if (isdigit(line[index])) {
 		    r->major_version = atoi(&line[index]);
 		    index += 2;
+		    printf("major 2\n");
 		    current_state = s_http_minor;
 	       } else {
 		    r->m = HTTP_INVALID;
@@ -134,16 +146,26 @@ int read_http_request(const char* line, http_request *r)
 	  case s_http_minor:
 	       if (isdigit(line[index])) {
 		    r->minor_version = atoi(&line[index]);
-		    while (line[index++] != ' ');
-		    current_state = s_header_done;
+		    printf("minor\n");
+		    while (line[index++] != ' ')
+		      ;
+		    index += 1;
+		    current_state = s_end_request;
 	       } else {
 		    r->m = HTTP_INVALID;
 		    current_state = s_header_done;
 		    return EXIT_FAILURE;
 	       }
-
-	       break;
 	       
+	       break;
+
+	  case s_end_request:
+	    if (line[index] == CR || line[index] == LF) {
+	      printf("end request\n");
+	      current_state = s_header_done;
+	    }
+	    break;
+	   
 	  }
      }
 
