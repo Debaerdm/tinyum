@@ -73,108 +73,175 @@ int append(char* s, size_t size, char c) {
  */
 int read_http_request(const char* line, http_request *r)
 {
-    int pos, last = strlen(line), current_state = s_start;
-    char ch;
-    char s[strlen(line)];
-    memset(s, 0, strlen(line));
+  int pos, last = strlen(line), current_state = s_start;
+  char ch;
+  char s[strlen(line)];
+  memset(s, 0, strlen(line));
 
-    for (pos = 0; pos < last; ++pos) {
-      ch = line[pos];
+  for (pos = 0; pos < last; ++pos) {
+    ch = line[pos];
       
-      switch (current_state) {
+    switch (current_state) {
       
-      case s_start:
-	if (words(line) != 3) {
-	  r->m = HTTP_INVALID;
-	  current_state = s_header_done;
-	  return EXIT_FAILURE;
-	} else if (ch == LF || ch == CR) {
-	  r->m = HTTP_INVALID;
-	  current_state = s_header_done;
-	  return EXIT_FAILURE;
-	} else if ((ch < 'A' || ch > 'Z') && ch != '_') {
-	  r->m = HTTP_INVALID;
-	  current_state = s_header_done;
-	  return EXIT_FAILURE;
-	} else { 
-	  current_state = s_method;
-	}
-
-	break;
-
-      case s_method:
-	if (ch == ' ') {
-
-	  switch (pos) {
-	    
-	  case 3:
-	    if (strncmp(line, "GET", 3) == 0) {
-	      r->m = HTTP_GET;
-	      current_state = s_uri;
-	      break;
-	    }
-
-	    if (strncmp(line, "PUT", 3) == 0) {
-	      current_state = s_uri;
-	      r->m = HTTP_PUT;
-	      break;
-	    }
-
-	  case 4:
-	    if (strncmp(line, "HEAD", 4) == 0) {
-	      current_state = s_uri;
-	      r->m = HTTP_HEAD;
-	      break;
-	    }
-
-	    if (strncmp(line, "POST", 4) == 0) {
-	      current_state = s_uri;
-	      r->m = HTTP_POST;
-	      break;
-	    }
-
-	  case 5:
-	    if (strncmp(line, "TRACE", 5) == 0) {
-	      current_state = s_uri;
-	      r->m = HTTP_TRACE;
-	      break;
-	    }
-
-	  case 6:
-	    if (strncmp(line, "DELETE", 6) == 0) {
-	      current_state = s_uri;
-	      r->m = HTTP_DELETE;
-	      break;
-	    }
-
-	  case 7:
-	    if (strncmp(line, "CONNECT", 7) == 0) {
-	      r->m = HTTP_CONNECT;
-	      break;
-	    }
-
-	    if (strncmp(line, "OPTIONS", 7) == 0) {
-	      r->m = HTTP_OPTIONS;
-	      break;
-	    }
-	  }
-	}
-
-	break;
-
-      case s_uri:
-	if (ch == ' ') {
-	  strcpy(r->uri, s);
-	  current_state = s_http_H;
-	  break;
-	} else {
-	  append(s, strlen(line), ch);
-	}	 
+    case s_start:
+      if (words(line) != 3) {
+	r->m = HTTP_INVALID;
+	current_state = s_header_done;
+	return EXIT_FAILURE;
+      } else if (ch == LF || ch == CR) {
+	r->m = HTTP_INVALID;
+	current_state = s_header_done;
+	return EXIT_FAILURE;
+      } else if ((ch < 'A' || ch > 'Z') && ch != '_') {
+	r->m = HTTP_INVALID;
+	current_state = s_header_done;
+	return EXIT_FAILURE;
+      } else { 
+	current_state = s_method;
       }
 
+      break;
+
+    case s_method:
+      if (ch == ' ') {
+
+	switch (pos) {
+	    
+	case 3:
+	  if (strncmp(line, "GET", 3) == 0) {
+	    r->m = HTTP_GET;
+	    current_state = s_uri;
+	    break;
+	  }
+
+	  if (strncmp(line, "PUT", 3) == 0) {
+	    current_state = s_uri;
+	    r->m = HTTP_PUT;
+	    break;
+	  }
+
+	case 4:
+	  if (strncmp(line, "HEAD", 4) == 0) {
+	    current_state = s_uri;
+	    r->m = HTTP_HEAD;
+	    break;
+	  }
+
+	  if (strncmp(line, "POST", 4) == 0) {
+	    current_state = s_uri;
+	    r->m = HTTP_POST;
+	    break;
+	  }
+
+	case 5:
+	  if (strncmp(line, "TRACE", 5) == 0) {
+	    current_state = s_uri;
+	    r->m = HTTP_TRACE;
+	    break;
+	  }
+
+	case 6:
+	  if (strncmp(line, "DELETE", 6) == 0) {
+	    current_state = s_uri;
+	    r->m = HTTP_DELETE;
+	    break;
+	  }
+
+	case 7:
+	  if (strncmp(line, "CONNECT", 7) == 0) {
+	    r->m = HTTP_CONNECT;
+	    break;
+	  }
+
+	  if (strncmp(line, "OPTIONS", 7) == 0) {
+	    r->m = HTTP_OPTIONS;
+	    break;
+	  }
+	}
+      }
+
+      break;
+
+    case s_uri:
+      if (ch == ' ') {
+	strcpy(r->uri, s);
+	current_state = s_http_correct;
+	break;
+      } else {
+	append(s, strlen(line), ch);
+      }
+
+      break;
+
+    case s_http_correct:
+      switch (ch) {
+      case ' ':
+	break;
+      case CR || LF:
+	current_state = s_header_done;
+	break;
+      case 'H':
+	current_state = s_http_H;
+	break;
+      default:
+	current_state = s_header_done;
+	return EXIT_FAILURE;
+      }
+      break;
+
+    case s_http_H:
+      switch (ch) {
+      case 'T':
+	current_state = s_http_HT;
+	break;
+      default:
+	r->m = HTTP_INVALID;
+	current_state = s_header_done;
+	return EXIT_FAILURE;
+      }
+      break;
+
+    case s_http_HT:
+      switch (ch) {
+      case 'T':
+	current_state = s_http_HTT;
+	break;
+      default:
+	r->m = HTTP_INVALID;
+	current_state = s_header_done;
+	return EXIT_FAILURE;
+      }
+      break;
+
+    case s_http_HTT:
+      switch (ch) {
+      case 'P':
+	current_state = s_http_HTTP;
+	break;
+      default:
+	r->m = HTTP_INVALID;
+	current_state = s_header_done;
+	return EXIT_FAILURE;
+      }
+      break;
+
+    case s_http_HTTP:
+      switch (ch) {
+      case '/':
+	current_state = s_http_major;
+	break;
+      default:
+	r->m = HTTP_INVALID;
+	current_state = s_header_done;
+	return EXIT_FAILURE;
+      }
+      break;
+	
     }
+
+  }
     
-    return EXIT_SUCCESS;
+  return EXIT_SUCCESS;
 }
 
 int main (void) {
