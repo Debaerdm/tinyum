@@ -17,6 +17,7 @@ enum state
 {
     s_start,
     s_method,
+    s_space_before_uri,
     s_uri,
     s_http_correct,
     s_http_H,
@@ -61,149 +62,101 @@ int words(const char* s)
  */
 int read_http_request(const char* line, http_request *r)
 {
-    int index = 0, current_state = s_start;
+    int pos, last = strlen(line), current_state = s_start;
     char ch;
-    while (current_state != s_header_done) {
 
-        switch (current_state) {
+    for (pos = 0; pos < last; ++pos) {
+      ch = line[pos];
+      
+      switch (current_state) {
+      
+      case s_start:
+	if (words(line) != 3) {
+	  r->m = HTTP_INVALID;
+	  current_state = s_header_done;
+	  return EXIT_FAILURE;
+	} else if (ch == LF || ch == CR) {
+	  r->m = HTTP_INVALID;
+	  current_state = s_header_done;
+	  return EXIT_FAILURE;
+	} else if ((ch < 'A' || ch > 'Z') && ch != '_') {
+	  r->m = HTTP_INVALID;
+	  current_state = s_header_done;
+	  return EXIT_FAILURE;
+	} else { 
+	  current_state = s_method;
+	}
 
-            case s_start:
+	break;
 
-                if (words(line) != 3) {
-                    r->m = HTTP_INVALID;
-                    current_state = s_header_done;
-                    return EXIT_FAILURE;
-                } else { 
-                    current_state = s_method;
-                }
+      case s_method:
+	if (ch == ' ') {
 
-                break;
+	  switch (pos) {
+	    
+	  case 3:
+	    if (strncmp(line, "GET", 3) == 0) {
+	      r->m = HTTP_GET;
+	      break;
+	    }
 
-            case s_method:
-                ch = line[index];
-                /* HTTP Method */
-                switch (ch) {
-                    case 'O': r->m = HTTP_OPTIONS; index = 7; break;
-                    case 'G': r->m = HTTP_GET; index = 3; break;
-                    case 'H': r->m = HTTP_HEAD; index = 4; break;
-                    case 'P': r->m = HTTP_POST; /* or PUT */ break;
-                    case 'D': r->m = HTTP_DELETE; index = 6; break;
-                    case 'T': r->m = HTTP_TRACE; index = 5; break;
-                    case 'C': r->m = HTTP_CONNECT; index = 7; break;
-                    default: r->m = HTTP_INVALID; break;
-                }
+	    if (strncmp(line, "PUT", 3) == 0) {
+	      r->m = HTTP_PUT;
+	      break;
+	    }
 
-                if (index == 0 && r->m == HTTP_POST) {
-                    ch = line[index++];
-                    if (ch == 'U') {
-                        r->m = HTTP_PUT;
-                        index = 3;
-                    } else {
-                        index = 4;
-                    }
-                }
+	  case 4:
+	    if (strncmp(line, "HEAD", 4) == 0) {
+	      r->m = HTTP_HEAD;
+	      break;
+	    }
 
-                index += 1;
-                current_state = s_uri;
+	    if (strncmp(line, "POST", 4) == 0) {
+	      r->m = HTTP_POST;
+	      break;
+	    }
 
-                break;
+	  case 5:
+	    if (strncmp(line, "TRACE", 5) == 0) {
+	      r->m = HTTP_TRACE;
+	      break;
+	    }
 
-            case s_uri:
-                /* Avoid uri */
-                while (line[index++] != ' ')
+	  case 6:
+	    if (strncmp(line, "DELETE", 6) == 0) {
+	      r->m = HTTP_DELETE;
+	      break;
+	    }
 
-                    current_state = s_http_correct;
-                break;
+	  case 7:
+	    if (strncmp(line, "CONNECT", 7) == 0) {
+	      r->m = HTTP_CONNECT;
+	      break;
+	    }
 
-            case s_http_correct:
-                switch(line[index]){
-                    case ' ':
-                        break;
-                    case CR || LF:
-                        current_state = s_header_done;
-                        break;
-                    case 'H':
-                        current_state = s_http_H;
-                        break;
-                    default:
-                        current_state = s_header_done;
-                        return EXIT_FAILURE;
-                }
+	    if (strncmp(line, "OPTIONS", 7) == 0) {
+	      r->m = HTTP_OPTIONS;
+	      break;
+	    }
 
-                break;
-            case s_http_H:
-                switch(line[++index]){
-                    case 'T':
-                        current_state = s_http_HT;
-                        break;
-                    default:
-                        r->m = HTTP_INVALID;
-                        current_state = s_header_done;
-                        return EXIT_FAILURE;
-                }
-                break;
-            case s_http_HT:
-                switch(line[++index]){
-                    case 'T':
-                        current_state = s_http_HTT;
-                        break;
-                    default:
-                        r->m = HTTP_INVALID;
-                        current_state = s_header_done;
-                        return EXIT_FAILURE;
-                }
-                break;
+	    current_state = s_uri;
+	  }
+	}
 
-            case s_http_HTT:
-                switch(line[++index]){
-                    case 'P':
-                        current_state = s_http_HTTP;
-                        break;
-                    default:
-                        r->m = HTTP_INVALID;
-                        current_state = s_header_done;
-                        return EXIT_FAILURE;
-                }
-                break;
-            case s_http_HTTP:
-                switch(line[++index]){
-                    case '/':
-                        current_state = s_http_major;
-                        break;
-                    default:
-                        r->m = HTTP_INVALID;
-                        current_state = s_header_done;
-                        return EXIT_FAILURE;
-                }
-                break;
-            case s_http_major:
-                if (isdigit(line[index])) {
-                    r->major_version = atoi(&line[index]);
-                    index += 2;
-                    current_state = s_http_minor;
-                } else {
-                    r->m = HTTP_INVALID;
-                    current_state = s_header_done;
-                    return EXIT_FAILURE;
-                }
+	break;
 
-                break;
-
-            case s_http_minor:
-                if (isdigit(line[index])) {
-                    r->minor_version = atoi(&line[index]);
-                    while (line[index++] != ' ');
-                    current_state = s_header_done;
-                } else {
-                    r->m = HTTP_INVALID;
-                    current_state = s_header_done;
-                    return EXIT_FAILURE;
-                }
-
-                break;
-
-        }
+      }
+      /* TODO URI */
     }
-
+    
     return EXIT_SUCCESS;
+}
+
+int main (void) {
+
+  http_request r;
+  read_http_request("GET / HTTP/1.1\n\r", &r);
+  if (r.m == HTTP_GET)
+    printf("GET\n");
+  return 0;
 }
