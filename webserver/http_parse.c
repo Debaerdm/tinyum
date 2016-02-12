@@ -15,13 +15,17 @@
  */
 enum state
 {
-     s_start,
-     s_method,
-     s_uri,
-     s_first_http_major,
-     s_http_major,
-     s_http_minor,
-     s_header_done,
+    s_start,
+    s_method,
+    s_uri,
+    s_http_correct,
+    s_http_H,
+    s_http_HT,
+    s_http_HTT,
+    s_http_HTTP,
+    s_http_major,
+    s_http_minor,
+    s_header_done,
 };
 
 /*
@@ -29,22 +33,22 @@ enum state
  */
 int words(const char* s)
 {
-     unsigned int index = 0;
-     const char *ch = s;
-     int state = OUT;
+    unsigned int index = 0;
+    const char *ch = s;
+    int state = OUT;
 
-     while (*ch) {
-	  if (isspace(*ch))
-	       state = OUT;
-	  else if (state == OUT) {
-	       state = IN;
-	       ++index;
-	  }
+    while (*ch) {
+        if (isspace(*ch))
+            state = OUT;
+        else if (state == OUT) {
+            state = IN;
+            ++index;
+        }
 
-	  ++ch;
-     }
+        ++ch;
+    }
 
-     return index;
+    return index;
 }
 
 /*
@@ -52,100 +56,149 @@ int words(const char* s)
  */
 int read_http_request(const char* line, http_request *r)
 {
-     int index = 0, current_state = s_start;
-     char ch;
-     while (current_state != s_header_done) {
-     
-	  switch (current_state) {
-	   
-	  case s_start:
-	    
-	       if (words(line) != 3) {
-		    r->m = HTTP_INVALID;
-		    current_state = s_header_done;
-		    return EXIT_FAILURE;
-	       } else { 
-		    current_state = s_method;
-	       }
-	       
-	       break;
-	       
-	  case s_method:
-	       ch = line[index];
-	       /* HTTP Method */
-	       switch (ch) {
-	       case 'O': r->m = HTTP_OPTIONS; index = 7; break;
-	       case 'G': r->m = HTTP_GET; index = 3; break;
-	       case 'H': r->m = HTTP_HEAD; index = 4; break;
-	       case 'P': r->m = HTTP_POST; /* or PUT */ break;
-	       case 'D': r->m = HTTP_DELETE; index = 6; break;
-	       case 'T': r->m = HTTP_TRACE; index = 5; break;
-	       case 'C': r->m = HTTP_CONNECT; index = 7; break;
-	       default: r->m = HTTP_INVALID; break;
-	       }
+    int index = 0, current_state = s_start;
+    char ch;
+    while (current_state != s_header_done) {
 
-	       if (index == 0 && r->m == HTTP_POST) {
-		    ch = line[index++];
-		    if (ch == 'U') {
-			 r->m = HTTP_PUT;
-			 index = 3;
-		    } else {
-			 index = 4;
-		    }
-	       }
-	       
-	       index += 1;
-	       current_state = s_uri;
-	       
-	       break;
-	       
-	  case s_uri:
-	       /* Avoid uri */
-	       while (line[index++] != ' ')
-	       
-	       current_state = s_first_http_major;
-	       break;
+        switch (current_state) {
 
-	  case s_first_http_major:
-	       if (strncmp("HTTP/", (line + index), 5) == 0) {
-		    index += 5;
-		    current_state = s_http_major;
-	       } else {
-		    r->m = HTTP_INVALID;
-		    current_state = s_header_done;
-		    return EXIT_FAILURE;
-	       }
-	       
-	       break;
-	       
-	  case s_http_major:
-	       if (isdigit(line[index])) {
-		    r->major_version = atoi(&line[index]);
-		    index += 2;
-		    current_state = s_http_minor;
-	       } else {
-		    r->m = HTTP_INVALID;
-		    current_state = s_header_done;
-		    return EXIT_FAILURE;
-	       }
+            case s_start:
 
-	       break;
+                if (words(line) != 3) {
+                    r->m = HTTP_INVALID;
+                    current_state = s_header_done;
+                    return EXIT_FAILURE;
+                } else { 
+                    current_state = s_method;
+                }
 
-	  case s_http_minor:
-	       if (isdigit(line[index])) {
-		    r->minor_version = atoi(&line[index]);
-		    while (line[index++] != ' ');
-		    current_state = s_header_done;
-	       } else {
-		    r->m = HTTP_INVALID;
-		    current_state = s_header_done;
-		    return EXIT_FAILURE;
-	       }
+                break;
 
-	       break;
-	       
-	  }
-     }
+            case s_method:
+                ch = line[index];
+                /* HTTP Method */
+                switch (ch) {
+                    case 'O': r->m = HTTP_OPTIONS; index = 7; break;
+                    case 'G': r->m = HTTP_GET; index = 3; break;
+                    case 'H': r->m = HTTP_HEAD; index = 4; break;
+                    case 'P': r->m = HTTP_POST; /* or PUT */ break;
+                    case 'D': r->m = HTTP_DELETE; index = 6; break;
+                    case 'T': r->m = HTTP_TRACE; index = 5; break;
+                    case 'C': r->m = HTTP_CONNECT; index = 7; break;
+                    default: r->m = HTTP_INVALID; break;
+                }
 
-     return EXIT_SUCCESS;
+                if (index == 0 && r->m == HTTP_POST) {
+                    ch = line[index++];
+                    if (ch == 'U') {
+                        r->m = HTTP_PUT;
+                        index = 3;
+                    } else {
+                        index = 4;
+                    }
+                }
+
+                index += 1;
+                current_state = s_uri;
+
+                break;
+
+            case s_uri:
+                /* Avoid uri */
+                while (line[index++] != ' ')
+
+                    current_state = s_http_correct;
+                break;
+
+            case s_http_correct:
+                switch(line[index]){
+                    case ' ':
+                        break;
+                    case CR || LF:
+                        current_state = s_header_done;
+                        break;
+                    case 'H':
+                        current_state = s_http_H;
+                        break;
+                    default:
+                        current_state = s_header_done;
+                        return EXIT_FAILURE;
+                }
+
+                break;
+            case s_http_H:
+                switch(line[++index]){
+                    case 'T':
+                        current_state = s_http_HT;
+                        break;
+                    default:
+                        r->m = HTTP_INVALID;
+                        current_state = s_header_done;
+                        return EXIT_FAILURE;
+                }
+                break;
+            case s_http_HT:
+                switch(line[++index]){
+                    case 'T':
+                        current_state = s_http_HTT;
+                        break;
+                    default:
+                        r->m = HTTP_INVALID;
+                        current_state = s_header_done;
+                        return EXIT_FAILURE;
+                }
+                break;
+
+            case s_http_HTT:
+                switch(line[++index]){
+                    case 'P':
+                        current_state = s_http_HTTP;
+                        break;
+                    default:
+                        r->m = HTTP_INVALID;
+                        current_state = s_header_done;
+                        return EXIT_FAILURE;
+                }
+                break;
+            case s_http_HTTP:
+                switch(line[++index]){
+                    case '/':
+                        current_state = s_http_major;
+                        break;
+                    default:
+                        r->m = HTTP_INVALID;
+                        current_state = s_header_done;
+                        return EXIT_FAILURE;
+                }
+                break;
+            case s_http_major:
+                if (isdigit(line[index])) {
+                    r->major_version = atoi(&line[index]);
+                    index += 2;
+                    current_state = s_http_minor;
+                } else {
+                    r->m = HTTP_INVALID;
+                    current_state = s_header_done;
+                    return EXIT_FAILURE;
+                }
+
+                break;
+
+            case s_http_minor:
+                if (isdigit(line[index])) {
+                    r->minor_version = atoi(&line[index]);
+                    while (line[index++] != ' ');
+                    current_state = s_header_done;
+                } else {
+                    r->m = HTTP_INVALID;
+                    current_state = s_header_done;
+                    return EXIT_FAILURE;
+                }
+
+                break;
+
+        }
+    }
+
+    return EXIT_SUCCESS;
 }
