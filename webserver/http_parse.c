@@ -24,8 +24,9 @@ enum state
     s_http_HT,
     s_http_HTT,
     s_http_HTTP,
-    s_http_major,
-    s_http_minor,
+    s_http_major_version,
+    s_http_between_version,
+    s_http_minor_version,
     s_header_done,
 };
 
@@ -228,7 +229,7 @@ int read_http_request(const char* line, http_request *r)
     case s_http_HTTP:
       switch (ch) {
       case '/':
-	current_state = s_http_major;
+	current_state = s_http_major_version;
 	break;
       default:
 	r->m = HTTP_INVALID;
@@ -236,7 +237,18 @@ int read_http_request(const char* line, http_request *r)
 	return EXIT_FAILURE;
       }
       break;
-	
+
+    case s_http_major_version:
+      if (isdigit(ch)) {
+	r->major_version = atoi(&ch);
+	current_state = s_http_between_version;
+      } else {
+	r->m = HTTP_INVALID;
+	current_state = s_header_done;
+	return EXIT_FAILURE;
+      }
+      
+      break;
     }
 
   }
