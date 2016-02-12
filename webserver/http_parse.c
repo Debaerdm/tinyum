@@ -24,8 +24,9 @@ enum state
     s_http_HT,
     s_http_HTT,
     s_http_HTTP,
+    s_http_first_major_version,
     s_http_major_version,
-    s_http_between_version,
+    s_http_first_minor_version,
     s_http_minor_version,
     s_header_done,
 };
@@ -229,7 +230,7 @@ int read_http_request(const char* line, http_request *r)
     case s_http_HTTP:
       switch (ch) {
       case '/':
-	current_state = s_http_major_version;
+	current_state = s_http_first_major_version;
 	break;
       default:
 	r->m = HTTP_INVALID;
@@ -238,17 +239,44 @@ int read_http_request(const char* line, http_request *r)
       }
       break;
 
-    case s_http_major_version:
-      if (isdigit(ch)) {
-	r->major_version = atoi(&ch);
-	current_state = s_http_between_version;
-      } else {
+    case s_http_first_major_version:
+      if (ch < '1' || ch > '9') {
 	r->m = HTTP_INVALID;
 	current_state = s_header_done;
 	return EXIT_FAILURE;
       }
-      
+
+      r->major_version = atoi(&ch);
+      current_state = s_http_major_version;
+
       break;
+
+    case s_http_major_version:
+      if (ch == '.') {
+	current_state = s_http_first_minor_version;
+	break;
+      }
+
+      if (ch < '0' || ch > '9') {
+	r->m = HTTP_INVALID;
+	current_state = s_header_done;
+	return EXIT_FAILURE;
+      }
+
+      r->major_version = r->major_version * 10 + atoi(&ch);
+      break;
+
+    case s_http_first_minor_version:
+      if (ch < '0' || ch > '9') {
+	r->m = HTTP_INVALID;
+	current_state = s_header_done;
+	return EXIT_FAILURE;
+      }
+
+      r->minor_version = atoi(&ch);
+      current_state = s_http_minor_version;
+      break;
+
     }
 
   }
@@ -264,5 +292,6 @@ int main (void) {
     printf("GET\n");
 
   printf("%s\n", r.uri);
+  printf("%d\n", r.major_version);
   return 0;
 }
