@@ -31,6 +31,8 @@ enum state
     s_header_done,
   };
 
+static int current_state = s_start;
+
 /*
  * words - return numbers of words in string
  */
@@ -68,12 +70,14 @@ int append(char* s, size_t size, char c) {
   return EXIT_SUCCESS;
 }
 
+
+
 /*
  * read_requesthdrs - read and parse HTTP request headers
  */
-int read_http_request(const char* line, http_request *r)
+int read_requesthdrs(const char* line, http_request *r)
 {
-  int pos, last = strlen(line), current_state = s_start;
+  int pos, last = strlen(line);
   char ch;
   char s[strlen(line)];
   memset(s, 0, strlen(line));
@@ -291,5 +295,13 @@ int read_http_request(const char* line, http_request *r)
 
   }
     
+  return EXIT_SUCCESS;
+}
+
+int read_http_request(const char *line, http_request *r)
+{
+  if (current_state != s_header_done)
+    read_requesthdrs(line, r);
+
   return EXIT_SUCCESS;
 }
