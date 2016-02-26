@@ -31,6 +31,7 @@
 #include "http_request.h"
 #include "signals.h"
 #include "socket.h"
+#include "http_status.h"
 
 #define BUFFER_SIZE 1024
 
@@ -65,7 +66,7 @@ int main(void)
 
 	  if (pid == 0) {
 
-	    const char *message = "Welcome to tinyum, tinyum is a server for TCP connection\n";
+	    //const char *message = "Welcome to tinyum, tinyum is a server for TCP connection\n";
 
 	       /* if (fwrite(message, strlen(message) + 1, 1, tinyum) == 0) {
 		    perror("fwrite");
@@ -80,15 +81,14 @@ int main(void)
 	       int parse;
 	       while ((fgets(buf, sizeof(buf), tinyum) != NULL)  /*&& (strcmp(buf,"\r\n")) && (strcmp(buf,"\n"))*/ && req.m != HTTP_GET) {
 		 parse = read_http_request(buf, &req);
-		 printf("%s\n", buf);
 		
 	       }
-	       printf("%d %d\n", parse, req.m);
 		 if (parse == 0 && req.m == HTTP_GET) {
 		   do {
 		     fgets(buf, sizeof(buf), tinyum);
 		   } while (buf[0] != '\n' && buf[0] != '\r');
-		   fwrite("HTTP/1.1 200 OK\n", 16, 1, tinyum);
+		   send_status(tinyum, 200);
+		   /*fwrite("HTTP/1.1 200 OK\n", 16, 1, tinyum);
 		   fwrite("Connection: close\n", 19, 1, tinyum);
 		   fwrite("Content-Length: 58\n", 20, 1, tinyum);
 		   fwrite("\n\r", 2, 1, tinyum);
@@ -100,7 +100,7 @@ int main(void)
 		   fwrite("Content-Length: 17\n", 18, 1, tinyum);
 		   fwrite("\n\r", 2, 1, tinyum);
 		   fwrite("400 Bad request\n", 17, 1, tinyum);
-		   
+		  */ 
 		   }
 		    memset(buf, 0, sizeof(buf));
 	       
