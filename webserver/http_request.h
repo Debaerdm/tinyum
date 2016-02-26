@@ -15,8 +15,7 @@ typedef struct {
      enum http_method m;
      int major_version;
      int minor_version;
-     char* uri;
+     char uri[512];
 } http_request;
      
-
 int read_http_request(const char*, http_request *);

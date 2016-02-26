@@ -65,7 +65,7 @@ int main(void)
 
 	  if (pid == 0) {
 
-	       const char *message = "Welcome to tinyum, tinyum is a server for TCP connection\n";
+	    const char *message = "Welcome to tinyum, tinyum is a server for TCP connection\n";
 
 	       /* if (fwrite(message, strlen(message) + 1, 1, tinyum) == 0) {
 		    perror("fwrite");
@@ -77,14 +77,23 @@ int main(void)
 	       /* Clean the buffer stream */
 	       memset(buf, 0, sizeof(buf));
 	       http_request req;
-	       while ((fgets(buf, sizeof(buf), tinyum)) != NULL){
-		 int parse = read_http_request(buf, &req);
+	       int parse;
+	       while ((fgets(buf, sizeof(buf), tinyum) != NULL)  /*&& (strcmp(buf,"\r\n")) && (strcmp(buf,"\n"))*/ && req.m != HTTP_GET) {
+		 parse = read_http_request(buf, &req);
+		 printf("%s\n", buf);
+		
+	       }
+	       printf("%d %d\n", parse, req.m);
 		 if (parse == 0 && req.m == HTTP_GET) {
+		   do {
+		     fgets(buf, sizeof(buf), tinyum);
+		   } while (buf[0] != '\n' && buf[0] != '\r');
 		   fwrite("HTTP/1.1 200 OK\n", 16, 1, tinyum);
 		   fwrite("Connection: close\n", 19, 1, tinyum);
 		   fwrite("Content-Length: 58\n", 20, 1, tinyum);
 		   fwrite("\n\r", 2, 1, tinyum);
 		   fwrite(message, strlen(message) + 1, 1, tinyum);
+		   printf("oui\n");
 		 } else if (req.m == HTTP_INVALID) {
 		   fwrite("HTTP/1.1 400 Bad Request\n", 26, 1, tinyum);
 		   fwrite("Connection: close\n", 19, 1, tinyum);
@@ -92,9 +101,9 @@ int main(void)
 		   fwrite("\n\r", 2, 1, tinyum);
 		   fwrite("400 Bad request\n", 17, 1, tinyum);
 		   
-		 }
+		   }
 		    memset(buf, 0, sizeof(buf));
-	       }
+	       
 	       fclose(tinyum);
 	       close(socket_client);
 	       return EXIT_SUCCESS;
