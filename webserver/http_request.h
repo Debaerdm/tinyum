@@ -17,5 +17,7 @@ typedef struct {
      int minor_version;
      char uri[512];
 } http_request;
-     
-int read_http_request(const char*, http_request *);
+
+char *fgets_or_exit(char *buf, int size, FILE *stream);
+void skip_headers(FILE *client);
+int read_http_header(const char*, http_request *);

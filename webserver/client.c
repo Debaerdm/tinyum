@@ -65,21 +65,15 @@ int main(void)
 
 
 	if (pid == 0) {
-
-	    //const char *message = "Welcome to tinyum, tinyum is a server for TCP connection\n";
-
-	    /* if (fwrite(message, strlen(message) + 1, 1, tinyum) == 0) {
-	       perror("fwrite");
-	       return EXIT_FAILURE;
-	       }*/
 	    char buf[BUFFER_SIZE];
 
 	    /* Clean the buffer stream */
 	    memset(buf, 0, sizeof(buf));
 	    http_request req;
-	    while ((fgets(buf, sizeof(buf), tinyum) != NULL)) {
-		read_http_request(buf, &req);
-	    }
+	    
+	    fgets_or_exit(buf, sizeof(buf), tinyum);
+	    read_http_header(buf, &req);
+	    skip_headers(tinyum);
 
 	    switch (req.m) {
 	    case HTTP_OPTIONS: break;
@@ -93,12 +87,6 @@ int main(void)
 	    case HTTP_CONNECT: break;
 	    default: break;
 	    }
-
-	    /*if(req.m == HTTP_GET){
-		send_status(tinyum, 200);
-	    } else if (req.m == HTTP_INVALID) {
-		send_status(tinyum, 400);
-		} */
 	    
 	    memset(buf, 0, sizeof(buf));
 	    fclose(tinyum);
