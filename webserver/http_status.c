@@ -26,39 +26,41 @@
 #include <unistd.h>
 
 const char *reason_phrase(int code){
-	switch(code){
-		case 200:
-				return "OK";
-		case 400:
-				return "Bad Request";
-		case 403:
-				return "Forbidden";
-		case 404:
-				return "Not Found";
-		case 405:
-				return "Method Not Allowed";
-		case 500:
-				return "Internal Server Error";
-		case 501:
-				return "Not Implemetend";
-		case 505:
-				return "HTTP Version Not Supported";
-		default:
-				return NULL;
-	}
+    switch(code){
+    case 200:
+	return "OK";
+    case 400:
+	return "Bad Request";
+    case 403:
+	return "Forbidden";
+    case 404:
+	return "Not Found";
+    case 405:
+	return "Method Not Allowed";
+    case 500:
+	return "Internal Server Error";
+    case 501:
+	return "Not Implemetend";
+    case 505:
+	return "HTTP Version Not Supported";
+    default:
+	return NULL;
+    }
 }
 
 void send_status(FILE *client, int code){
-	char message[64] = "HTTP/1.1";
-	char str[15];
-	sprintf(str, " %d ", code);
-	strcat(message, str);
-	strcat(message, reason_phrase(code));
-	fwrite(message, strlen(message)+2, 1, client);	
+    char message[64] = "HTTP/1.1";
+    char str[15];
+    sprintf(str, " %d ", code);
+    strcat(message, str);
+    strcat(message, reason_phrase(code));
+    printf("%s\n", message);
+    //return message;
+    fwrite(message, strlen(message), 1, client);	
 }
 
 
 /*void send_response(FILE *client, int code, const char *phrase, const char *message_body){
 		
 
-}*/
+  }*/
