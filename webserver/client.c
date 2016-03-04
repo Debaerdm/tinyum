@@ -72,22 +72,17 @@ int main(void)
 	    http_request req;
 	    
 	    fgets_or_exit(buf, sizeof(buf), tinyum);
-	    read_http_header(buf, &req);
+
+	    int request;
+	    request = read_http_header(buf, &req);
 	    skip_headers(tinyum);
 
-	    switch (req.m) {
-	    case HTTP_OPTIONS: break;
-	    case HTTP_GET: send_status(tinyum, 200); break;
-	    case HTTP_INVALID: send_status(tinyum, 400); break;
-	    case HTTP_HEAD: break;
-	    case HTTP_PUT: break;
-	    case HTTP_POST: break;
-	    case HTTP_DELETE: break;
-	    case HTTP_TRACE: break;
-	    case HTTP_CONNECT: break;
-	    default: break;
+	    if (request) {
+	      send_response(tinyum, 400, "Bad Request\r\n");
+	    } else if (req.m == HTTP_INVALID) {
+	      send_response(tinyum, 405, "Method Not Allowed\r\n");
 	    }
-	    
+	   	    
 	    memset(buf, 0, sizeof(buf));
 	    fclose(tinyum);
 	    close(socket_client);

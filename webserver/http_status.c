@@ -24,27 +24,19 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#define CR "\n"
 
 const char *reason_phrase(int code){
     switch(code){
-    case 200:
-	return "OK";
-    case 400:
-	return "Bad Request";
-    case 403:
-	return "Forbidden";
-    case 404:
-	return "Not Found";
-    case 405:
-	return "Method Not Allowed";
-    case 500:
-	return "Internal Server Error";
-    case 501:
-	return "Not Implemetend";
-    case 505:
-	return "HTTP Version Not Supported";
-    default:
-	return NULL;
+    case 200: return "OK" CR;
+    case 400: return "Bad Request" CR;
+    case 403: return "Forbidden" CR;
+    case 404: return "Not Found" CR;
+    case 405: return "Method Not Allowed" CR;
+    case 500: return "Internal Server Error" CR;
+    case 501: return "Not Implemetend" CR;
+    case 505: return "HTTP Version Not Supported" CR;
+    default: return NULL;
     }
 }
 
@@ -55,12 +47,11 @@ void send_status(FILE *client, int code){
     strcat(message, str);
     strcat(message, reason_phrase(code));
     printf("%s\n", message);
-    //return message;
     fwrite(message, strlen(message), 1, client);	
 }
 
 
-/*void send_response(FILE *client, int code, const char *phrase, const char *message_body){
-		
-
-  }*/
+void send_response(FILE *client, int code, const char *message_body){
+  send_status(client, code);
+  fprintf(client, "Connection: close\r\nContent-length: %zu\r\n\r\n%s", strlen(message_body), message_body);
+  }
