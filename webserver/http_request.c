@@ -96,19 +96,15 @@ int read_http_header(const char* line, http_request *r)
 	switch (current_state) {
       
 	case s_start:
-	    /*if (words(line) != 3) {
+	    if (words(line) != 3) {
 	      r->m = HTTP_INVALID;
 	      current_state = s_header_done;
 	      return EXIT_FAILURE;
-	      }*/
-
-	    if (ch == LF || ch == CR) {
-		break;
-		/*r->m = HTTP_INVALID;
-		  current_state = s_header_done;
-		  return EXIT_FAILURE;*/
 	    }
 
+	    if (ch == LF || ch == CR)
+		break;
+	
 	    if ((ch < 'A' || ch > 'Z') && ch != '_') {
 		r->m = HTTP_INVALID;
 		current_state = s_header_done;
@@ -119,8 +115,7 @@ int read_http_header(const char* line, http_request *r)
 	    break;
 
 	case s_method:
-	    printf("%c\n", ch);
-	    if (ch == ' ') {
+	   if (ch == ' ') {
 		switch (pos) {
 		case 3:
 		    if (strncmp(line, "GET", 3) == 0) {
@@ -172,11 +167,15 @@ int read_http_header(const char* line, http_request *r)
 			break;
 		    }
 		    break;
-		default: r->m = HTTP_INVALID; break;
 		}
-	    }
-	    //current_state = s_uri;
-	    break;
+		if (current_state != s_uri) {
+		  r->m = HTTP_INVALID;
+		  current_state = s_header_done;
+		  return EXIT_FAILURE;
+		}
+	   }
+
+	break;
 
 	case s_uri:
 	    if (ch == ' ') {

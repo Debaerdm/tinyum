@@ -43,6 +43,8 @@ int main(void)
 
     initialize_signals();
 
+    const char * motd = "It's work!\r\n";
+
     for (;;) {
 	if ((socket_client = accept(socket_server, NULL, NULL)) == -1) {
 	    perror("Connection refused");
@@ -81,6 +83,10 @@ int main(void)
 	      send_response(tinyum, 400, "Bad Request\r\n");
 	    } else if (req.m == HTTP_INVALID) {
 	      send_response(tinyum, 405, "Method Not Allowed\r\n");
+	    } else if (strcmp(req.uri, "/") == 0) {
+	      send_response(tinyum, 200, motd);
+	    } else {
+	      send_response(tinyum, 404, "Not Found\r\n");
 	    }
 	   	    
 	    memset(buf, 0, sizeof(buf));
