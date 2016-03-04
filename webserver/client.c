@@ -38,41 +38,42 @@
 
 int main(void)
 {
-     int socket_client, socket_server;
-     if ((socket_server = create_server(8080)) == -1) return EXIT_FAILURE;
+    int socket_client, socket_server;
+    if ((socket_server = create_server(8080)) == -1) return EXIT_FAILURE;
 
-     initialize_signals();
+    initialize_signals();
 
-     for (;;) {
-	  if ((socket_client = accept(socket_server, NULL, NULL)) == -1) {
-	       perror("Connection refused");
-	       return EXIT_FAILURE;
-	  }
+    for (;;) {
+	if ((socket_client = accept(socket_server, NULL, NULL)) == -1) {
+	    perror("Connection refused");
+	    return EXIT_FAILURE;
+	}
 
-	  puts("Client connected");
+	puts("Client connected");
 
-	  FILE *tinyum;
-	  if ((tinyum = fdopen(socket_client, "w+")) == NULL){
-	       perror("fdopen");
-	       return EXIT_FAILURE;
-	  }
+	FILE *tinyum;
+	if ((tinyum = fdopen(socket_client, "w+")) == NULL){
+	    perror("fdopen");
+	    return EXIT_FAILURE;
+	}
 
-	  pid_t pid;
-	  if ((pid = fork()) == -1) {
-	       perror("fork");
-	       return EXIT_FAILURE;
-	  }
+	pid_t pid;
+	if ((pid = fork()) == -1) {
+	    perror("fork");
+	    return EXIT_FAILURE;
+	}
 
 
-	  if (pid == 0) {
+	if (pid == 0) {
 
 	    //const char *message = "Welcome to tinyum, tinyum is a server for TCP connection\n";
 
-	       /* if (fwrite(message, strlen(message) + 1, 1, tinyum) == 0) {
-		    perror("fwrite");
-		    return EXIT_FAILURE;
-		    }*/
+	    /* if (fwrite(message, strlen(message) + 1, 1, tinyum) == 0) {
+	       perror("fwrite");
+	       return EXIT_FAILURE;
+	       }*/
 	       
+<<<<<<< HEAD
 	       char buf[BUFFER_SIZE];
 
 	       /* Clean the buffer stream */
@@ -103,16 +104,47 @@ int main(void)
 		  */ 
 		   }
 		    memset(buf, 0, sizeof(buf));
+=======
+	    char buf[BUFFER_SIZE];
+
+	    /* Clean the buffer stream */
+	    memset(buf, 0, sizeof(buf));
+	    http_request req;
+	    while ((fgets(buf, sizeof(buf), tinyum) != NULL)) {
+		read_http_request(buf, &req);
+	    }
+
+	    switch (req.m) {
+	    case HTTP_OPTIONS: break;
+	    case HTTP_GET: send_status(tinyum, 200); break;
+	    case HTTP_INVALID: send_status(tinyum, 400); break;
+	    case HTTP_HEAD: break;
+	    case HTTP_PUT: break;
+	    case HTTP_POST: break;
+	    case HTTP_DELETE: break;
+	    case HTTP_TRACE: break;
+	    case HTTP_CONNECT: break;
+	    default: break;
+	    }
+
+	    /*if(req.m == HTTP_GET){
+		send_status(tinyum, 200);
+	    } else if (req.m == HTTP_INVALID) {
+		send_status(tinyum, 400);
+		} */
+	    
+	    memset(buf, 0, sizeof(buf));
+>>>>>>> f6386c0782c08bfdd287cc2bb29ae4aac246825a
 	       
-	       fclose(tinyum);
-	       close(socket_client);
-	       return EXIT_SUCCESS;
-	  } else {
-	       close(socket_client);
-	  }
-     }
+	    fclose(tinyum);
+	    close(socket_client);
+	    return EXIT_SUCCESS;
+	} else {
+	    close(socket_client);
+	}
+    }
 
-     close(socket_server);
+    close(socket_server);
 
-     return EXIT_SUCCESS;
+    return EXIT_SUCCESS;
 }

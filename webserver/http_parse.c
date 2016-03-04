@@ -80,7 +80,7 @@ int read_http_request(const char* line, http_request *r)
 
   for (pos = 0; pos < last; ++pos) {
     ch = line[pos];
-      
+    
     switch (current_state) {
       
     case s_start:
@@ -103,6 +103,7 @@ int read_http_request(const char* line, http_request *r)
       break;
 
     case s_method:
+	printf("%c\n", ch);
       if (ch == ' ') {
 
 	switch (pos) {
@@ -157,6 +158,7 @@ int read_http_request(const char* line, http_request *r)
 	    r->m = HTTP_OPTIONS;
 	    break;
 	  }
+	default: r->m = HTTP_INVALID; break;
 	}
       }
 
@@ -277,13 +279,13 @@ int read_http_request(const char* line, http_request *r)
 
     case s_http_minor_version:
       if (ch == CR) {
-	printf("FINI");
+	printf("FINI\n");
 	current_state = s_header_done;
 	break;
       }
 
       if (ch == LF) {
-	printf("FINI");
+	printf("FINI\n");
 	current_state = s_header_done;
 	break;
       }
