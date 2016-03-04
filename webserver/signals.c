@@ -31,7 +31,7 @@ void handler(int sig)
     int status;
     
     if ((pid = waitpid(-1, &status, WNOHANG)) > 0)
-        printf("Signal %d recivied\n", sig);
+        printf("Signal %d received\n", sig);
 }
 
 void initialize_signals(void)
