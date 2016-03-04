@@ -72,39 +72,6 @@ int main(void)
 	       perror("fwrite");
 	       return EXIT_FAILURE;
 	       }*/
-	       
-<<<<<<< HEAD
-	       char buf[BUFFER_SIZE];
-
-	       /* Clean the buffer stream */
-	       memset(buf, 0, sizeof(buf));
-	       http_request req;
-	       int parse;
-	       while ((fgets(buf, sizeof(buf), tinyum) != NULL) && req.m != HTTP_GET) {
-		 parse = read_http_request(buf, &req);
-		
-	       }
-		 if (parse == 0 && req.m == HTTP_GET) {
-		   do {
-		     fgets(buf, sizeof(buf), tinyum);
-		   } while (buf[0] != '\n' && buf[0] != '\r');
-		   send_status(tinyum, 200);
-		   /*fwrite("HTTP/1.1 200 OK\n", 16, 1, tinyum);
-		   fwrite("Connection: close\n", 19, 1, tinyum);
-		   fwrite("Content-Length: 58\n", 20, 1, tinyum);
-		   fwrite("\n\r", 2, 1, tinyum);
-		   fwrite(message, strlen(message) + 1, 1, tinyum);
-		   printf("oui\n");
-		 } else if (req.m == HTTP_INVALID) {
-		   fwrite("HTTP/1.1 400 Bad Request\n", 26, 1, tinyum);
-		   fwrite("Connection: close\n", 19, 1, tinyum);
-		   fwrite("Content-Length: 17\n", 18, 1, tinyum);
-		   fwrite("\n\r", 2, 1, tinyum);
-		   fwrite("400 Bad request\n", 17, 1, tinyum);
-		  */ 
-		   }
-		    memset(buf, 0, sizeof(buf));
-=======
 	    char buf[BUFFER_SIZE];
 
 	    /* Clean the buffer stream */
@@ -134,8 +101,6 @@ int main(void)
 		} */
 	    
 	    memset(buf, 0, sizeof(buf));
->>>>>>> f6386c0782c08bfdd287cc2bb29ae4aac246825a
-	       
 	    fclose(tinyum);
 	    close(socket_client);
 	    return EXIT_SUCCESS;
