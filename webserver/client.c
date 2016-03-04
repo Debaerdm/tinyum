@@ -78,7 +78,7 @@ int main(void)
 	       memset(buf, 0, sizeof(buf));
 	       http_request req;
 	       int parse;
-	       while ((fgets(buf, sizeof(buf), tinyum) != NULL)  /*&& (strcmp(buf,"\r\n")) && (strcmp(buf,"\n"))*/ && req.m != HTTP_GET) {
+	       while ((fgets(buf, sizeof(buf), tinyum) != NULL) && req.m != HTTP_GET) {
 		 parse = read_http_request(buf, &req);
 		 printf("%s\n", buf);
 		
