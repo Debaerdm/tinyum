@@ -75,8 +75,7 @@ int main(void)
 	    
 	    fgets_or_exit(buf, sizeof(buf), tinyum);
 
-	    int request;
-	    request = read_http_header(buf, &req);
+	    int request = read_http_header(buf, &req);
 	    skip_headers(tinyum);
 
 	    if (request) {
