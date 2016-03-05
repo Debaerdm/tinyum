@@ -41,17 +41,10 @@ const char *reason_phrase(int code){
 }
 
 void send_status(FILE *client, int code){
-    char message[64] = "HTTP/1.1";
-    char str[15];
-    sprintf(str, " %d ", code);
-    strcat(message, str);
-    strcat(message, reason_phrase(code));
-    printf("%s\n", message);
-    fwrite(message, strlen(message), 1, client);	
+    fprintf(client, "HTTP/1.1 %d %s\r\n", code, reason_phrase(code)); 
 }
 
-
 void send_response(FILE *client, int code, const char *message_body){
-  send_status(client, code);
-  fprintf(client, "Connection: close\r\nContent-length: %zu\r\n\r\n%s", strlen(message_body), message_body);
-  }
+    send_status(client, code);
+    fprintf(client, "Connection: close\r\nContent-length: %zu\r\n\r\n%s", strlen(message_body), message_body);
+}
