@@ -191,9 +191,12 @@ int read_http_header(const char* line, http_request *r)
 	    switch (ch) {
 	    case ' ':
 		break;
-	    case CR || LF:
+	    case CR:
 		current_state = s_header_done;
 		break;
+            case LF:
+                current_state = s_header_done;
+                break;
 	    case 'H':
 		current_state = s_http_H;
 		break;
