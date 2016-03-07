@@ -1,9 +1,12 @@
 #include <sys/stat.h>
+#include <unistd.h>
 #include <ctype.h>
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <fcntl.h>
+#include <sys/types.h>
+#include <sys/mman.h>
 
 const char  *rewrite_url(char *url){
     if(strcmp(url, "/") == 0) {
@@ -38,4 +41,33 @@ int get_file_size(int fildes) {
     }
 
     return file_stat.st_size;
+}
+
+int copy(int in, int out) {
+    char *src, *dst;
+    /* go to the location corresponding to the last byte */
+    if (lseek(out, (get_file_size(in) - 1), SEEK_SET) == -1) {
+        perror("lseek");
+        return EXIT_FAILURE;
+    }
+
+    /* write a dummy byte at the last location */
+    if (write(out, "", 1) != 1) {
+        perror("write");
+        return EXIT_FAILURE;
+    }
+
+    if ((src = mmap(0, get_file_size(in), PROT_READ, MAP_SHARED, in, 0)) == (caddr_t) -1) {
+        perror("mmap error for input");
+        return EXIT_FAILURE;
+    }
+
+    if ((dst = mmap(0, get_file_size(in), PROT_READ | PROT_WRITE, MAP_SHARED, out, 0)) == (caddr_t) -1) {
+        perror("mmap error for output");
+        return EXIT_FAILURE;
+    }
+
+    memcpy(dst, src, get_file_size(in));
+    
+    return EXIT_SUCCESS;
 }
