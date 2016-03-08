@@ -8,6 +8,8 @@
 #include <sys/types.h>
 #include <sys/mman.h>
 
+#define BUFSIZ 1024
+
 const char  *rewrite_url(char *url){
     if(strcmp(url, "/") == 0) {
 	return "/index.html";
@@ -44,30 +46,17 @@ int get_file_size(int fildes) {
 }
 
 int copy(int in, int out) {
-    char *src, *dst;
-    /* go to the location corresponding to the last byte */
-    if (lseek(out, (get_file_size(in) - 1), SEEK_SET) == -1) {
-        perror("lseek");
-        return EXIT_FAILURE;
-    }
+    int n;
+    char tamp[BUFSIZ];
 
-    /* write a dummy byte at the last location */
-    if (write(out, "", 1) != 1) {
-        perror("write");
-        return EXIT_FAILURE;
-    }
+    memset(tamp, 0, BUFSIZ);
 
-    if ((src = mmap(0, get_file_size(in), PROT_READ, MAP_SHARED, in, 0)) == (caddr_t) -1) {
-        perror("mmap error for input");
-        return EXIT_FAILURE;
+    while ((n = read(in, tamp, BUFSIZ)) > 0) {
+        printf("%d\n", n);
+        if (write(out, tamp, n) != n) {
+            perror("write");
+            return EXIT_FAILURE;
+        }
     }
-
-    if ((dst = mmap(0, get_file_size(in), PROT_READ | PROT_WRITE, MAP_SHARED, out, 0)) == (caddr_t) -1) {
-        perror("mmap error for output");
-        return EXIT_FAILURE;
-    }
-
-    memcpy(dst, src, get_file_size(in));
-    
     return EXIT_SUCCESS;
 }

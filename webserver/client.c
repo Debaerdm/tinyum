@@ -32,9 +32,10 @@
 #include "signals.h"
 #include "socket.h"
 #include "http_status.h"
+#include "config_url.h"
 
 #define BUFFER_SIZE 1024
-
+#define WWW_DIR "/Users/boinc/Documents/public_html"
 
 int main(void)
 {
@@ -43,7 +44,7 @@ int main(void)
 
     initialize_signals();
 
-    const char * motd = "It's work!\r\n";
+    /*const char * motd = "It's work!\r\n";*/
 
     for (;;) {
 	if ((socket_client = accept(socket_server, NULL, NULL)) == -1) {
@@ -82,16 +83,24 @@ int main(void)
 	      send_response(tinyum, 400, "Bad Request\r\n");
 	    } else if (req.m == HTTP_INVALID) {
 	      send_response(tinyum, 405, "Method Not Allowed\r\n");
-	    } else if (strcmp(req.uri, "/") == 0) {
-	      send_response(tinyum, 200, motd);
 	    } else {
-	      send_response(tinyum, 404, "Not Found\r\n");
+                int fildes; 
+                if ((fildes = check_and_open(req.uri, WWW_DIR)) < 0) {
+                    send_response(tinyum, 404, "Not Found\r\n");
+                    return EXIT_FAILURE;
+                } else {
+                    send_response(tinyum, 200, "OK\r\n");
+                    fprintf(tinyum, "Connection: close\r\nContent-type: %s\r\nContent-length: %d\r\n\r\n", "text/html", get_file_size(fildes));
+                    fflush(tinyum);
+                    printf("Here\n");
+                    copy(fildes, socket_client);
 	    }
 	   	    
 	    memset(buf, 0, sizeof(buf));
 	    fclose(tinyum);
 	    close(socket_client);
 	    return EXIT_SUCCESS;
+            }
 	} else {
 	    close(socket_client);
 	}
