@@ -8,18 +8,20 @@
 #include <sys/types.h>
 #include <sys/mman.h>
 
-#define BUFSIZ 1024
+#define BUFFER_SIZE 1024
 
-const char  *rewrite_url(char *url){
-    if(strcmp(url, "/") == 0) {
+const char *rewrite_url(char *url){
+    if (strcmp(url, "/") == 0)
 	return "/index.html";
-    }
+    
     printf("%s\n", url);
     char *tmp = strchr(url, '?');
-    if (tmp == NULL) {
+    
+    if (tmp == NULL)
 	return url;
-    }
+    
     url[(tmp - url)] = '\0';
+    
     return url;
 }
 
@@ -47,12 +49,12 @@ int get_file_size(int fildes) {
 
 int copy(int in, int out) {
     int n;
-    char tamp[BUFSIZ];
+    char tamp[BUFFER_SIZE];
 
-    memset(tamp, 0, BUFSIZ);
+    memset(tamp, 0, BUFFER_SIZE);
 
-    while ((n = read(in, tamp, BUFSIZ)) > 0) {
-        printf("%d\n", n);
+    while ((n = read(in, tamp, BUFFER_SIZE)) > 0) {
+        printf("%s\n", tamp);
         if (write(out, tamp, n) != n) {
             perror("write");
             return EXIT_FAILURE;
