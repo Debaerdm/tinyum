@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "http_request.h"
+#include "config_url.h"
 
 #define CR '\n'
 #define LF '\r'
@@ -179,6 +180,8 @@ int read_http_header(const char* line, http_request *r)
 	case s_uri:
 	    if (ch == ' ') {
 		strcpy(r->uri, s);
+		strcpy(r->uri, rewrite_url(r->uri));
+		printf("%s\n", r->uri);
 		current_state = s_http_correct;
 		break;
 	    } else {
@@ -294,13 +297,11 @@ int read_http_header(const char* line, http_request *r)
 
 	case s_http_minor_version:
 	    if (ch == CR) {
-		printf("FINI\n");
 		current_state = s_header_done;
 		break;
 	    }
 
 	    if (ch == LF) {
-		printf("FINI\n");
 		current_state = s_header_done;
 		break;
 	    }
