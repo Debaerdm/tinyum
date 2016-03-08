@@ -35,7 +35,7 @@
 #include "config_url.h"
 
 #define BUFFER_SIZE 1024
-#define WWW_DIR "/home/infoetu/boinc/public_html"
+#define WWW_DIR "/Users/boinc/Documents/public_html"
 
 int main(void)
 {
@@ -90,16 +90,17 @@ int main(void)
                     return EXIT_FAILURE;
                 } else {
                     send_status(tinyum, 200);
-                    fprintf(tinyum, "Connection: close\r\nContent-type: %s\r\nContent-length: %d\r\n\r\n", "text/html", get_file_size(fildes));
+                    fprintf(tinyum, "Connection: close\r\nContent-Type: %s\r\nContent-length: %d\r\n\r\n", "text/html", get_file_size(fildes));
                     fflush(tinyum);
                     copy(fildes, socket_client);
-	    }
+                }
+            }
 	   	    
 	    memset(buf, 0, sizeof(buf));
 	    fclose(tinyum);
 	    close(socket_client);
 	    return EXIT_SUCCESS;
-            }
+            
 	} else {
 	    close(socket_client);
 	}

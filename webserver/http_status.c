@@ -41,7 +41,7 @@ const char *reason_phrase(int code){
 }
 
 void send_status(FILE *client, int code){
-    fprintf(client, "HTTP/1.1 %d %s\r\n", code, reason_phrase(code)); 
+    fprintf(client, "HTTP/1.1 %d %s", code, reason_phrase(code)); 
 }
 
 void send_response(FILE *client, int code, const char *message_body){

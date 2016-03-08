@@ -14,20 +14,20 @@ const char *rewrite_url(char *url){
     if (strcmp(url, "/") == 0)
 	return "/index.html";
     
-    printf("%s\n", url);
     char *tmp = strchr(url, '?');
     
     if (tmp == NULL)
 	return url;
     
     url[(tmp - url)] = '\0';
-    
+
     return url;
 }
 
 int check_and_open(const char *url, const char *document_root){
     char path[strlen(url) + strlen(document_root) + 1];
     sprintf(path, "%s%s", document_root, url);
+    printf("%s%s\n", document_root, url);
     struct stat conf;
     if (stat(path, &conf) == -1) {
         perror("stat");
@@ -58,7 +58,7 @@ int copy(int in, int out) {
     memset(tamp, 0, BUFFER_SIZE);
 
     while ((n = read(in, tamp, BUFFER_SIZE)) > 0) {
-        printf("%s\n", tamp);
+
         if (write(out, tamp, n) != n) {
             perror("write");
             return EXIT_FAILURE;
