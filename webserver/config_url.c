@@ -26,11 +26,14 @@ const char *rewrite_url(char *url){
 }
 
 int check_and_open(const char *url, const char *document_root){
+  printf("LOL\n");
     char path[strlen(url) + strlen(document_root) + 1];
-    sprintf(path, "%s%s", url, document_root);
+    printf("%s%s\n", url, document_root);
+    sprintf(path, "%s%s", document_root, url);
     struct stat conf;
     stat(path, &conf);
     if (S_ISREG(conf.st_mode)) {
+      printf("open\n");
 	return open(path, O_RDONLY);
     }
     return EXIT_FAILURE;
