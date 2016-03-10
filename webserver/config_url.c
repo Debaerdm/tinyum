@@ -66,24 +66,31 @@ int copy(int in, int out) {
 const char *application_type(char *url){
     const char *dot = strrchr(url, '.');
     if ( !dot || dot == url) return "";
-
-    if (strcmp(dot, "html")) {
+    printf("%s\n", dot+1);
+    if (strcmp(dot+1, "html") == 0){
 	return "text/html";
     }
-    else if (strcmp(dot, "xml") == 0){
+    else if (strcmp(dot+1, "xml") == 0){
 	return "application/xml";
     }
-    else if (strcmp(dot, "js") == 0){
+    else if (strcmp(dot+1, "js") == 0){
 	return "application/javascript";
     }
-    else if (strcmp(dot, "css") == 0){
+    else if (strcmp(dot+1, "css") == 0){
 	return "text/css";
     }
-    else if (strcmp(dot, "jpg") == 0){
+    else if (strcmp(dot+1, "jpg") == 0){
 	return "image/jpeg";
     }
-    else if (strcmp(dot, "png") == 0){
+    else if (strcmp(dot+1, "png") == 0){
 	return "image/png";
     }
     return "text";
+}
+
+int url_valid(char *url){
+    if(strstr(url, "..") == NULL){
+	return EXIT_FAILURE;
+    }
+    return EXIT_SUCCESS;
 }
