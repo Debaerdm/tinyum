@@ -179,9 +179,8 @@ int read_http_header(const char* line, http_request *r)
 
 	case s_uri:
 	    if (ch == ' ') {
-		strcpy(r->uri, s);
-		strcpy(r->uri, rewrite_url(r->uri));
-		printf("%s\n", r->uri);
+		strcpy(r->uri, rewrite_url(s));
+       		printf("%s\n", r->uri);
 		current_state = s_http_correct;
 		break;
 	    } else {
