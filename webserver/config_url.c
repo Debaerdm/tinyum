@@ -20,7 +20,7 @@ const char *rewrite_url(char *url){
 	return url;
     
     url[(tmp - url)] = '\0';
-
+    
     return url;
 }
 
@@ -55,10 +55,7 @@ int copy(int in, int out) {
     int n;
     char tamp[BUFFER_SIZE];
 
-    memset(tamp, 0, BUFFER_SIZE);
-
     while ((n = read(in, tamp, BUFFER_SIZE)) > 0) {
-
         if (write(out, tamp, n) != n) {
             perror("write");
             return EXIT_FAILURE;
@@ -66,3 +63,7 @@ int copy(int in, int out) {
     }
     return EXIT_SUCCESS;
 }
+
+/*const char *application_type(char *path){
+    
+  }*/
