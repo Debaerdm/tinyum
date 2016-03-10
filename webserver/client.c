@@ -84,6 +84,9 @@ int main(void)
 	      send_response(tinyum, 400, "Bad Request\r\n");
 	    } else if (req.m == HTTP_INVALID) {
 	      send_response(tinyum, 405, "Method Not Allowed\r\n");
+	    } else if (url_valid(req.uri) == 1) {
+		send_response(tinyum, 403, "Forbidden\r\n");
+		return EXIT_FAILURE;
 	    } else {
                 int fildes;
 		char *path = getenv("HOME");
@@ -91,10 +94,7 @@ int main(void)
                 if ((fildes = check_and_open(req.uri, path)) == 1) {
                     send_response(tinyum, 404, "Not Found\r\n");
                     return EXIT_FAILURE;
-		} else if (url_valid(req.uri) == 1) {
-		    send_response(tinyum, 403, "Forbidden\r\n");
-		    return EXIT_FAILURE;
-                } else {
+		} else {
                     send_status(tinyum, 200);
                     fprintf(tinyum, "Connection: close\r\nContent-Type: %s\r\nContent-length: %d\r\n\r\n", application_type(req.uri), get_file_size(fildes));
                     fflush(tinyum);
