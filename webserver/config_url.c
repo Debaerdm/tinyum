@@ -27,10 +27,9 @@ const char *rewrite_url(char *url){
 int check_and_open(const char *url, const char *document_root){
     char path[strlen(url) + strlen(document_root) + 1];
     sprintf(path, "%s%s", document_root, url);
-    printf("%s%s\n", document_root, url);
     struct stat conf;
     if (stat(path, &conf) == -1) {
-        perror("stat");
+        perror(path);
         return EXIT_FAILURE;
     }
 
@@ -64,6 +63,27 @@ int copy(int in, int out) {
     return EXIT_SUCCESS;
 }
 
-/*const char *application_type(char *path){
-    
-  }*/
+const char *application_type(char *url){
+    const char *dot = strrchr(url, '.');
+    if ( !dot || dot == url) return "";
+
+    if (strcmp(dot, "html")) {
+	return "text/html";
+    }
+    else if (strcmp(dot, "xml") == 0){
+	return "application/xml";
+    }
+    else if (strcmp(dot, "js") == 0){
+	return "application/javascript";
+    }
+    else if (strcmp(dot, "css") == 0){
+	return "text/css";
+    }
+    else if (strcmp(dot, "jpg") == 0){
+	return "image/jpeg";
+    }
+    else if (strcmp(dot, "png") == 0){
+	return "image/png";
+    }
+    return "text";
+}
