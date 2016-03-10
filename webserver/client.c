@@ -35,7 +35,7 @@
 #include "config_url.h"
 
 #define BUFFER_SIZE 1024
-#define WWW_DIR "/home/infoetu/debaerdm/public_html"
+#define WWW_DIR "/public_html"
 
 int main(void)
 {
@@ -85,10 +85,15 @@ int main(void)
 	    } else if (req.m == HTTP_INVALID) {
 	      send_response(tinyum, 405, "Method Not Allowed\r\n");
 	    } else {
-                int fildes; 
-                if ((fildes = check_and_open(req.uri, WWW_DIR)) == 1) {
+                int fildes;
+		char *path = getenv("HOME");
+		strcat(path, WWW_DIR);
+                if ((fildes = check_and_open(req.uri, path)) == 1) {
                     send_response(tinyum, 404, "Not Found\r\n");
                     return EXIT_FAILURE;
+		} else if (url_valid(path) == 1) {
+		    send_response(tinyum, 403, "Forbidden\r\n");
+		    return EXIT_FAILURE;
                 } else {
                     send_status(tinyum, 200);
                     fprintf(tinyum, "Connection: close\r\nContent-Type: %s\r\nContent-length: %d\r\n\r\n", application_type(req.uri), get_file_size(fildes));
