@@ -20,16 +20,7 @@
 * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include <stdlib.h>
-#include <unistd.h>
-#include <stdio.h>
-#include <signal.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <netinet/ip.h>
-#include <sys/types.h>
-#include <sys/wait.h>
-#include <setjmp.h>
+#include "socket.h"
 
 int create_server(int port)
 {
