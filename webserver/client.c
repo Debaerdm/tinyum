@@ -35,7 +35,7 @@
 #include "config_url.h"
 
 #define BUFFER_SIZE 1024
-#define WWW_DIR "/Users/boinc/Documents/public_html"
+#define WWW_DIR "home/infoetu/debaerdm/public_html"
 
 int main(void)
 {
@@ -76,7 +76,8 @@ int main(void)
 	    
 	    fgets_or_exit(buf, sizeof(buf), tinyum);
 
-	    int request = read_http_header(buf, &req);
+	    int request;
+	    request = read_http_header(buf, &req);
 	    skip_headers(tinyum);
 
 	    if (request) {
@@ -94,6 +95,7 @@ int main(void)
                     fflush(tinyum);
                     copy(fildes, socket_client);
                 }
+		close(fildes);
             }
 	   	    
 	    memset(buf, 0, sizeof(buf));
