@@ -89,8 +89,9 @@ const char *application_type(char *url){
 }
 
 int url_valid(char *url){
+    printf("%d\n", EXIT_SUCCESS);
     if(strstr(url, "..") == NULL){
-	return EXIT_FAILURE;
+	return EXIT_SUCCESS;
     }
-    return EXIT_SUCCESS;
+    return EXIT_FAILURE;
 }

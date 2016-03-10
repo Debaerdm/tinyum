@@ -91,7 +91,7 @@ int main(void)
                 if ((fildes = check_and_open(req.uri, path)) == 1) {
                     send_response(tinyum, 404, "Not Found\r\n");
                     return EXIT_FAILURE;
-		} else if (url_valid(path) == 1) {
+		} else if (url_valid(req.uri) == 1) {
 		    send_response(tinyum, 403, "Forbidden\r\n");
 		    return EXIT_FAILURE;
                 } else {
