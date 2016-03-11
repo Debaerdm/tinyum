@@ -27,7 +27,7 @@
 #define CR "\n"
 
 const char *reason_phrase(int code){
-    switch(code){
+  switch(code){
     case 200: return "OK" CR;
     case 400: return "Bad Request" CR;
     case 403: return "Forbidden" CR;
@@ -37,14 +37,14 @@ const char *reason_phrase(int code){
     case 501: return "Not Implemetend" CR;
     case 505: return "HTTP Version Not Supported" CR;
     default: return NULL;
-    }
+  }
 }
 
 void send_status(FILE *client, int code){
-    fprintf(client, "HTTP/1.1 %d %s", code, reason_phrase(code)); 
+  fprintf(client, "HTTP/1.1 %d %s", code, reason_phrase(code)); 
 }
 
 void send_response(FILE *client, int code, const char *message_body){
-    send_status(client, code);
-    fprintf(client, "Connection: close\r\nContent-length: %zu\r\n\r\n%s", strlen(message_body), message_body);
+  send_status(client, code);
+  fprintf(client, "Connection: close\r\nContent-length: %zu\r\n\r\n%s", strlen(message_body), message_body);
 }

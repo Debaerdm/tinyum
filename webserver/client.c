@@ -40,84 +40,84 @@
 
 int main(void)
 {
-    int socket_client, socket_server;
-    if ((socket_server = create_server(8080)) == -1) return EXIT_FAILURE;
+  int socket_client, socket_server;
+  if ((socket_server = create_server(8080)) == -1) return EXIT_FAILURE;
 
-    initialize_signals();
-    web_stats *stats = get_stats(void);
-    /*const char * motd = "It's work!\r\n";*/
+  initialize_signals();
+  web_stats *stats = get_stats(void);
+  /*const char * motd = "It's work!\r\n";*/
 
-    for (;;) {
-	if ((socket_client = accept(socket_server, NULL, NULL)) == -1) {
-	    perror("Connection refused");
-	    return EXIT_FAILURE;
-	}
-
-	puts("Client connected");
-	stats->served_connections++;
-	
-	FILE *tinyum;
-	if ((tinyum = fdopen(socket_client, "w+")) == NULL){
-	    perror("fdopen");
-	    return EXIT_FAILURE;
-	}
-
-	pid_t pid;
-	if ((pid = fork()) == -1) {
-	    perror("fork");
-	    return EXIT_FAILURE;
-	}
-
-
-	if (pid == 0) {
-	    char buf[BUFFER_SIZE];
-
-	    /* Clean the buffer stream */
-	    memset(buf, 0, sizeof(buf));
-	    http_request req;
-	    
-	    fgets_or_exit(buf, sizeof(buf), tinyum);
-	    
-	    int request;
-	    request = read_http_header(buf, &req);
-	    stats->served_requests++;
-	    skip_headers(tinyum);
-
-	    if (request) {
-	      send_response(tinyum, 400, "Bad Request\r\n");
-	    } else if (req.m == HTTP_INVALID) {
-	      send_response(tinyum, 405, "Method Not Allowed\r\n");
-	    } else if (url_valid(req.uri) == 1) {
-		send_response(tinyum, 403, "Forbidden\r\n");
-		return EXIT_FAILURE;
-	    } else {
-                int fildes;
-		char *path = getenv("HOME");
-		strcat(path, WWW_DIR);
-                if ((fildes = check_and_open(req.uri, path)) == 1) {
-                    send_response(tinyum, 404, "Not Found\r\n");
-                    return EXIT_FAILURE;
-		} else {
-                    send_status(tinyum, 200);
-                    fprintf(tinyum, "Connection: close\r\nContent-Type: %s\r\nContent-length: %d\r\n\r\n", application_type(req.uri), get_file_size(fildes));
-                    fflush(tinyum);
-                    copy(fildes, socket_client);
-                }
-		close(fildes);
-            }
-	   	    
-	    memset(buf, 0, sizeof(buf));
-	    fclose(tinyum);
-	    close(socket_client);
-	    return EXIT_SUCCESS;
-            
-	} else {
-	    close(socket_client);
-	    fclose(tinyum);
-	}
+  for (;;) {
+    if ((socket_client = accept(socket_server, NULL, NULL)) == -1) {
+      perror("Connection refused");
+      return EXIT_FAILURE;
     }
 
-    close(socket_server);
+    puts("Client connected");
+    stats->served_connections++;
+	
+    FILE *tinyum;
+    if ((tinyum = fdopen(socket_client, "w+")) == NULL){
+      perror("fdopen");
+      return EXIT_FAILURE;
+    }
 
-    return EXIT_SUCCESS;
+    pid_t pid;
+    if ((pid = fork()) == -1) {
+      perror("fork");
+      return EXIT_FAILURE;
+    }
+
+
+    if (pid == 0) {
+      char buf[BUFFER_SIZE];
+
+      /* Clean the buffer stream */
+      memset(buf, 0, sizeof(buf));
+      http_request req;
+	    
+      fgets_or_exit(buf, sizeof(buf), tinyum);
+	    
+      int request;
+      request = read_http_header(buf, &req);
+      stats->served_requests++;
+      skip_headers(tinyum);
+
+      if (request) {
+        send_response(tinyum, 400, "Bad Request\r\n");
+      } else if (req.m == HTTP_INVALID) {
+        send_response(tinyum, 405, "Method Not Allowed\r\n");
+      } else if (url_valid(req.uri) == 1) {
+        send_response(tinyum, 403, "Forbidden\r\n");
+        return EXIT_FAILURE;
+      } else {
+        int fildes;
+        char *path = getenv("HOME");
+        strcat(path, WWW_DIR);
+        if ((fildes = check_and_open(req.uri, path)) == 1) {
+          send_response(tinyum, 404, "Not Found\r\n");
+          return EXIT_FAILURE;
+        } else {
+          send_status(tinyum, 200);
+          fprintf(tinyum, "Connection: close\r\nContent-Type: %s\r\nContent-length: %d\r\n\r\n", application_type(req.uri), get_file_size(fildes));
+          fflush(tinyum);
+          copy(fildes, socket_client);
+        }
+        close(fildes);
+      }
+
+      memset(buf, 0, sizeof(buf));
+      fclose(tinyum);
+      close(socket_client);
+      return EXIT_SUCCESS;
+            
+    } else {
+      close(socket_client);
+      fclose(tinyum);
+    }
+  }
+
+  close(socket_server);
+
+  return EXIT_SUCCESS;
 }
