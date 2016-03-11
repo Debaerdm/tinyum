@@ -33,6 +33,7 @@
 #include "socket.h"
 #include "http_status.h"
 #include "config_url.h"
+#include "stats.h"
 
 #define BUFFER_SIZE 1024
 #define WWW_DIR "/public_html"
@@ -43,7 +44,7 @@ int main(void)
     if ((socket_server = create_server(8080)) == -1) return EXIT_FAILURE;
 
     initialize_signals();
-
+    web_stats *stats = get_stats(void);
     /*const char * motd = "It's work!\r\n";*/
 
     for (;;) {
@@ -53,7 +54,8 @@ int main(void)
 	}
 
 	puts("Client connected");
-
+	stats->served_connections++;
+	
 	FILE *tinyum;
 	if ((tinyum = fdopen(socket_client, "w+")) == NULL){
 	    perror("fdopen");
@@ -75,9 +77,10 @@ int main(void)
 	    http_request req;
 	    
 	    fgets_or_exit(buf, sizeof(buf), tinyum);
-
+	    
 	    int request;
 	    request = read_http_header(buf, &req);
+	    stats->served_requests++;
 	    skip_headers(tinyum);
 
 	    if (request) {
