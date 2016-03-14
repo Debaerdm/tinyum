@@ -47,7 +47,6 @@ int main(void)
   web_stats *stats;
   init_stats();
   stats = get_stats();
-  /*const char * motd = "It's work!\r\n";*/
 
   for (;;) {
     if ((socket_client = accept(socket_server, NULL, NULL)) == -1) {
