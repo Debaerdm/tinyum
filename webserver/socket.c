@@ -22,6 +22,9 @@
 
 #include "socket.h"
 
+/*
+ * create_server - start listen socket on given port
+ */
 int create_server(int port)
 {
   int socket_server;

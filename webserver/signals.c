@@ -25,6 +25,9 @@
 #include <signal.h> 
 #include <sys/wait.h>
 
+/*
+ * handler - catch signal and wait after child
+ */
 void handler(int sig)
 {   
   pid_t pid;
@@ -34,6 +37,9 @@ void handler(int sig)
     printf("Signal %d received\n", sig);
 }
 
+/*
+ *  initialize_signals - fill signaction struct with current information
+ */
 void initialize_signals(void)
 {
   struct sigaction sa;

@@ -1,6 +1,6 @@
 CC=gcc
 LD=gcc
-CFLAGS=-Wall -W -Werror -Wwrite-strings -g
+CFLAGS=-Wall -Wextra -W -Werror -Wwrite-strings -pedantic -Wshadow -Wstrict-overflow -fno-strict-aliasing -Wno-missing-field-initializers -O2 -g
 LDFLAGS=
 EXE=tinyum
 HEADERS=$(wildcard *.h)
