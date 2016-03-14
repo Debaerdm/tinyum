@@ -94,7 +94,7 @@ int main(void)
         stats->ko_403++;
         return EXIT_FAILURE;
       } else if (strcmp(req.uri, "/stats") == 0){
-            send_stats(tinyum);
+        send_stats(tinyum);
       } else {
         int fildes;
         char *path = getenv("HOME");

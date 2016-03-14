@@ -13,7 +13,7 @@ static web_stats stats;
 int32_t replace_variable(FILE *client){
   struct stat file_stat;
   int file;
-  if((file = open("stats.html", O_RDWR)) == -1){
+  if((file = open("public_html/stats.html", O_RDWR)) == -1){
     perror("open");
     return EXIT_FAILURE;
   }
@@ -39,12 +39,11 @@ int32_t replace_variable(FILE *client){
 
 void send_stats(FILE *client){
   send_status(client, 200);
-  fprintf(client, "text/html");
-  replace_variable(client);
-  /*if(replace_variable(client) == 1){
+  fprintf(client, "Content-Type: text/html\n\n");
+  if(replace_variable(client) == 1){
     perror("Replace failed");
     exit(1);
-    }*/
+  }
 }
 
 int32_t init_stats(void){
