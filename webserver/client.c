@@ -44,7 +44,9 @@ int main(void)
   if ((socket_server = create_server(8080)) == -1) return EXIT_FAILURE;
 
   initialize_signals();
-  web_stats *stats = get_stats(void);
+  web_stats *stats;
+  init_stats();
+  stats = get_stats();
   /*const char * motd = "It's work!\r\n";*/
 
   for (;;) {
@@ -68,7 +70,6 @@ int main(void)
       return EXIT_FAILURE;
     }
 
-
     if (pid == 0) {
       char buf[BUFFER_SIZE];
 
@@ -85,19 +86,26 @@ int main(void)
 
       if (request) {
         send_response(tinyum, 400, "Bad Request\r\n");
+        stats->ko_400++;
       } else if (req.m == HTTP_INVALID) {
         send_response(tinyum, 405, "Method Not Allowed\r\n");
+        stats->ko_405++;
       } else if (url_valid(req.uri) == 1) {
         send_response(tinyum, 403, "Forbidden\r\n");
+        stats->ko_403++;
         return EXIT_FAILURE;
+      } else if (strcmp(req.uri, "/stats") == 0){
+            send_stats(tinyum);
       } else {
         int fildes;
         char *path = getenv("HOME");
         strcat(path, WWW_DIR);
         if ((fildes = check_and_open(req.uri, path)) == 1) {
           send_response(tinyum, 404, "Not Found\r\n");
+          stats->ko_404++;
           return EXIT_FAILURE;
         } else {
+          stats->ok_200++;
           send_status(tinyum, 200);
           fprintf(tinyum, "Connection: close\r\nContent-Type: %s\r\nContent-length: %d\r\n\r\n", application_type(req.uri), get_file_size(fildes));
           fflush(tinyum);
@@ -109,8 +117,7 @@ int main(void)
       memset(buf, 0, sizeof(buf));
       fclose(tinyum);
       close(socket_client);
-      return EXIT_SUCCESS;
-            
+      return EXIT_SUCCESS;      
     } else {
       close(socket_client);
       fclose(tinyum);
