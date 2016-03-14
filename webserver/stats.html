@@ -1,30 +1,14 @@
 <html>
   <head>
     <title> Statistique server </title>
-    <script src="jquery-2.1.3.js"> </script>
-    <style> 
-      #panel, #flip {
-      padding: 5px;
-      text-align: center;
-      background-color: #e5eecc;
-      border: solid 1px #c3c3c3;
-      }
-
-      #panel {
-      padding: 50px;
-      display: none;
-      }
-    </style>
+    <script src="jquery-2.1.3.js" type="application/javascript" > </script>
+    <script src="main.js" type="application/javascript" > </script>
+    <link href="style.css" rel="stylesheet" type="text/css">
   </head>
   <body>
-    <script> $(document).ready(function(){
-      $("#flip").click(function(){
-      $("#panel").slideDown();
-      });
-      }); </script>
-    <div id="#flip">Click to slide down panel</div>
-    <div id="#panel">
-      <h1 id="#stat_h1"> Statistique : </h1>
+    <div id="flip">Click to slide down panel</div>
+    <div id="panel">
+      <h1> Statistique : </h1>
       <p> Connection : %d </p>
       <p> Requetes : %d </p>
       <p> ok_200 : %d </p>

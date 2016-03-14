@@ -63,10 +63,9 @@ int copy(int in, int out) {
   return EXIT_SUCCESS;
 }
 
-const char *application_type(char *url){
+const char *application_type(const char *url){
   const char *dot = strrchr(url, '.');
   if ( !dot || dot == url) return "";
-  printf("%s\n", dot+1);
   if (strcmp(dot+1, "html") == 0){
     return "text/html";
   }
@@ -89,7 +88,6 @@ const char *application_type(char *url){
 }
 
 int url_valid(char *url){
-  printf("%d\n", EXIT_SUCCESS);
   if(strstr(url, "..") == NULL){
     return EXIT_SUCCESS;
   }

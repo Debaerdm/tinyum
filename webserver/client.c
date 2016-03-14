@@ -101,7 +101,14 @@ int main(void)
         char *path = getenv("HOME");
         strcat(path, WWW_DIR);
         if ((fildes = check_and_open(req.uri, path)) == 1) {
-          send_response(tinyum, 404, "Not Found\r\n");
+          send_status(tinyum, 404);
+          int not_found_file;
+          if((not_found_file = check_and_open("/404.html", path)) != 1){
+            fprintf(tinyum, "Connection: close\r\nContent-Type: %s\r\nContent-length: %d\r\n\r\n", application_type("/404.html"), get_file_size(not_found_file));
+          fflush(tinyum);
+          copy(not_found_file, socket_client);
+          }
+          close(not_found_file);
           stats->ko_404++;
           return EXIT_FAILURE;
         } else {
