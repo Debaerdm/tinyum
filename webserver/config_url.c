@@ -10,6 +10,9 @@
 
 #define BUFFER_SIZE 1024
 
+/*
+ *  rewrite_url - rewrite url if is "/"
+ */
 const char *rewrite_url(char *url){
   if (strcmp(url, "/") == 0)
     return "/index.html";
@@ -24,9 +27,14 @@ const char *rewrite_url(char *url){
   return url;
 }
 
+/*
+ * check_and_open - check if file given by url exsit and open it
+ */
 int check_and_open(const char *url, const char *document_root){
   char path[strlen(url) + strlen(document_root) + 1];
+
   sprintf(path, "%s%s", document_root, url);
+
   struct stat conf;
   if (stat(path, &conf) == -1) {
     perror(path);
@@ -39,6 +47,9 @@ int check_and_open(const char *url, const char *document_root){
   return EXIT_FAILURE;
 }
 
+/*
+ * get_file_size - retrun size of file
+ */
 int get_file_size(int fildes) {
   struct stat file_stat;
 
@@ -50,6 +61,9 @@ int get_file_size(int fildes) {
   return file_stat.st_size;
 }
 
+/*
+ * copy - read into file descriptor in and rewrite into out
+ */
 int copy(int in, int out) {
   int n;
   char tamp[BUFFER_SIZE];
@@ -63,6 +77,9 @@ int copy(int in, int out) {
   return EXIT_SUCCESS;
 }
 
+/*
+ * application_type - return content type by checking file extention
+ */
 const char *application_type(char *url){
   const char *dot = strrchr(url, '.');
   if ( !dot || dot == url) return "";
@@ -88,10 +105,12 @@ const char *application_type(char *url){
   return "text";
 }
 
-int url_valid(char *url){
-  printf("%d\n", EXIT_SUCCESS);
-  if(strstr(url, "..") == NULL){
+/*
+ * url_valid - avoid url contains ".."
+ */
+int url_valid(char *url) {
+  if(strstr(url, "..") == NULL)
     return EXIT_SUCCESS;
-  }
+
   return EXIT_FAILURE;
 }
