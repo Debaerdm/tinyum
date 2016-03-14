@@ -1,0 +1,12 @@
+#panel, #flip {
+    padding: 5px;
+    background-color: #aaaaaa;
+    border: solid 1px #444444;
+    width: 250px;
+    max-height: 250px;
+}
+
+#panel {
+    text-align: left;
+    display: none;
+}
