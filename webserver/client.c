@@ -82,7 +82,10 @@ int main(void)
       request = read_http_header(buf, &req);
       stats->served_requests++;
       skip_headers(tinyum);
-
+      
+      char *path = getenv("HOME");
+      strcat(path, WWW_DIR);
+        
       if (request) {
         send_response(tinyum, 400, "Bad Request\r\n");
         stats->ko_400++;
@@ -94,18 +97,18 @@ int main(void)
         stats->ko_403++;
         return EXIT_FAILURE;
       } else if (strcmp(req.uri, "/stats") == 0){
-        send_stats(tinyum);
+        strcat(req.uri, ".html");
+        strcat(path, req.uri);
+        send_stats(tinyum, path);
       } else {
         int fildes;
-        char *path = getenv("HOME");
-        strcat(path, WWW_DIR);
         if ((fildes = check_and_open(req.uri, path)) == 1) {
           send_status(tinyum, 404);
           int not_found_file;
           if((not_found_file = check_and_open("/404.html", path)) != 1){
             fprintf(tinyum, "Connection: close\r\nContent-Type: %s\r\nContent-length: %d\r\n\r\n", application_type("/404.html"), get_file_size(not_found_file));
-          fflush(tinyum);
-          copy(not_found_file, socket_client);
+            fflush(tinyum);
+            copy(not_found_file, socket_client);
           }
           close(not_found_file);
           stats->ko_404++;

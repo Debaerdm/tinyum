@@ -10,10 +10,10 @@
 
 static web_stats stats;
 
-int32_t replace_variable(FILE *client){
+int32_t replace_variable(FILE *client, char *uri){
   struct stat file_stat;
   int file;
-  if((file = open("public_html/stats.html", O_RDWR)) == -1){
+  if((file = open(uri, O_RDWR)) == -1){
     perror("open");
     return EXIT_FAILURE;
   }
@@ -37,10 +37,10 @@ int32_t replace_variable(FILE *client){
   return EXIT_SUCCESS;
 }
 
-void send_stats(FILE *client){
+void send_stats(FILE *client, char *uri){
   send_status(client, 200);
-  fprintf(client, "Content-Type: text/html\n\n");
-  if(replace_variable(client) == 1){
+  fprintf(client, "Content-Type: %s\n\n", application_type(uri));
+  if(replace_variable(client, uri) == 1){
     perror("Replace failed");
     exit(1);
   }
