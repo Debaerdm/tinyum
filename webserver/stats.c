@@ -48,7 +48,7 @@ void send_stats(FILE *client, char *uri){
 
 int32_t init_stats(void){
   stats.served_connections = stats.served_requests = stats.ok_200 = stats.ko_400 = stats.ko_403 = stats.ko_404 = stats.ko_405 = 0;
-  return EXIT_SUCCESS;
+  return stats.served_connections == 0 && stats.served_requests == 0 && stats.ok_200 == 0 &&  stats.ko_400 == 0 && stats.ko_403 == 0 && stats.ko_404 == 0 &&  stats.ko_405 == 0;
 }
 
 web_stats *get_stats(void){
