@@ -19,8 +19,8 @@ int main(void)
   if ((socket_server = create_server(8080)) == -1) return EXIT_FAILURE;
 
   initialize_signals();
-  web_stats *stats = get_stats();
   init_stats();
+  web_stats *stats = get_stats();
   
   for (;;) {
     if ((socket_client = accept(socket_server, NULL, NULL)) == -1) 
