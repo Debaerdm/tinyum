@@ -9,19 +9,20 @@
 #include "../include/http_status.h"
 #include "../include/config_url.h"
 
+#define handle_error(msg) \
+	do { perror(msg); exit(EXIT_FAILURE); } while (0)
+
 static web_stats *pstats;
 
-int32_t replace_variable(FILE *client, char *uri){
+void replace_variable(FILE *client, char *uri){
   struct stat file_stat;
   int file;
   if((file = open(uri, O_RDWR)) == -1){
-    perror("open");
-    return EXIT_FAILURE;
+    handle_error("open_stats");
   }
   
   if (fstat(file, &file_stat) < 0) {
-    perror("fstat");
-    return EXIT_FAILURE;
+    handle_error("stats files");
   }
       
   char buff[file_stat.st_size];
@@ -31,28 +32,22 @@ int32_t replace_variable(FILE *client, char *uri){
   }
   
   if(size_buf == -1){
-    perror("read");
-    return EXIT_FAILURE;
+    handle_error("read file");
   }
   close(file);
-  return EXIT_SUCCESS;
 }
 
 void send_stats(FILE *client, char *uri){
   send_status(client, 200);
   fprintf(client, "Content-Type: %s\n\n", application_type(uri));
-  if(replace_variable(client, uri) == 1){
-    perror("Replace failed");
-    exit(1);
-  }
+  replace_variable(client, uri);
 }
 
 int init_stats(void){
   char *addr;
  
   if ((addr = mmap(NULL, sizeof(web_stats), PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0)) == MAP_FAILED) {
-	perror("mmap");
-	return EXIT_FAILURE;
+    handle_error("mmap");
   }
   
   pstats = ((web_stats *) addr);

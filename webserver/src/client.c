@@ -36,8 +36,12 @@
 #define BUFFER_SIZE 1024
 #define WWW_DIR "/public_html"
 
-int client(FILE *tinyum, web_stats *stats, int socket_client)
+#define handle_error(msg) \
+	do { perror(msg); exit(EXIT_FAILURE); } while (0)
+
+int client(FILE *tinyum, int socket_client)
 {
+    web_stats *stats = get_stats();
     char buf[BUFFER_SIZE];
 
     /* Clean the buffer stream */
@@ -48,7 +52,7 @@ int client(FILE *tinyum, web_stats *stats, int socket_client)
 	    
     int request;
     request = read_http_header(buf, &req);
-    stats->served_requests++;
+    ++stats->served_requests;
     skip_headers(tinyum);
       
     char *path = getenv("HOME");
@@ -61,10 +65,10 @@ int client(FILE *tinyum, web_stats *stats, int socket_client)
     } else if (url_valid(req.uri) == 1) {
       send_response(tinyum, 403, "Forbidden\r\n");
       return EXIT_FAILURE;
-    } else if (strcmp(req.uri, "/stats") == 0 || strcmp(req.uri, "/stats.html") == 0){
+    } else if (strcmp(req.uri, "/stats") == 0 || strcmp(req.uri, "/stats.html") == 0 /*strstr(req.uri, "/stats") != NULL*/){
       if(strcmp(req.uri, "/stats") == 0){
         strcat(req.uri, ".html");
-      }
+        }
       strcat(path, req.uri);
       send_stats(tinyum, path);
     } else {

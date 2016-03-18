@@ -14,7 +14,7 @@ typedef struct
   int ko_405;
 } web_stats;
 
-int32_t replace_variable(FILE *client, char* uri);
+void replace_variable(FILE *client, char* uri);
 void send_stats(FILE *client, char *uri);
 int init_stats(void);
 web_stats *get_stats(void);
