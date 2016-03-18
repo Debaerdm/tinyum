@@ -36,12 +36,8 @@
 #define BUFFER_SIZE 1024
 #define WWW_DIR "/public_html"
 
-#define handle_error(msg) \
-	do { perror(msg); exit(EXIT_FAILURE); } while (0)
-
-int client(FILE *tinyum, int socket_client)
+int client(FILE *tinyum, web_stats *stats, int socket_client)
 {
-    web_stats *stats = get_stats();
     char buf[BUFFER_SIZE];
 
     /* Clean the buffer stream */
@@ -52,7 +48,7 @@ int client(FILE *tinyum, int socket_client)
 	    
     int request;
     request = read_http_header(buf, &req);
-    ++stats->served_requests;
+    stats->served_requests++;
     skip_headers(tinyum);
       
     char *path = getenv("HOME");
@@ -60,13 +56,18 @@ int client(FILE *tinyum, int socket_client)
         
     if (request) {
       send_response(tinyum, 400, "Bad Request\r\n");
+      stats->ko_400++;
     } else if (req.m == HTTP_INVALID) {
       send_response(tinyum, 405, "Method Not Allowed\r\n");
+      stats->ko_405++;
     } else if (url_valid(req.uri) == 1) {
       send_response(tinyum, 403, "Forbidden\r\n");
+      stats->ko_403++;
       return EXIT_FAILURE;
-    } else if (strcmp(req.uri, "/stats") == 0){
-      strcat(req.uri, ".html");
+    } else if (strcmp(req.uri, "/stats") == 0 || strcmp(req.uri, "/stats.html") == 0){
+      if(strcmp(req.uri, "/stats") == 0){
+        strcat(req.uri, ".html");
+      }
       strcat(path, req.uri);
       send_stats(tinyum, path);
     } else {
@@ -80,8 +81,10 @@ int client(FILE *tinyum, int socket_client)
           copy(not_found_file, socket_client);
         }
         close(not_found_file);
+        stats->ko_404++;
         return EXIT_FAILURE;
       } else {
+        stats->ok_200++;
         send_status(tinyum, 200);
         fprintf(tinyum, "Connection: close\r\nContent-Type: %s\r\nContent-length: %d\r\n\r\n", application_type(req.uri), get_file_size(fildes));
         fflush(tinyum);

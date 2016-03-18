@@ -7,12 +7,13 @@ EXE=tinyum
 CFILES:=$(wildcard $(SRCDIR)/*.c)
 INCLUDES:=$(wildcard $(INCDIR)/*.h)
 OBJECTS:=$(CFILES:$(SRCDIR)/%.c=$(OBJDIR)/%.o)
-CFLAGS=-Wall -Wextra -W -Werror -Wwrite-strings -Wshadow -Wstrict-overflow -fno-strict-aliasing -Wno-missing-field-initializers -O2 -g
+CFLAGS=-Wall -Wextra -W -Werror -pedantic -Wwrite-strings -Wshadow -Wstrict-overflow -fno-strict-aliasing -Wno-missing-field-initializers -O2 -g
 LDFLAGS=
+MKDIR_P=mkdir -p
 
-.PHONY:all clean mrproper
+.PHONY:all clean mrproper directories
 
-all: $(EXE)
+all: directories $(EXE)
 
 $(EXE): $(OBJECTS)
 	$(LD) $@ $(LSFLAGS) $(OBJECTS)
@@ -22,6 +23,11 @@ $(OBJECTS): $(OBJDIR)/%.o : $(SRCDIR)/%.c
 	$(CC) $(CFLAGS) -c $< -o $@
 	@echo "Compiled "$<" successfully!"
 
+directories: $(OBJDIR)
+
+$(OBJDIR):
+	$(MKDIR_P) $(OBJDIR)
+	@echo "Create "$(OBJDIR)" folder!"
 clean:
 	$(rm) $(OBJECTS)
 	@echo "Cleanup complete!"
