@@ -2,8 +2,8 @@
 #include <ctype.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include "http_request.h"
-#include "config_url.h"
+#include "../include/http_request.h"
+#include "../include/config_url.h"
 
 #define CR '\n'
 #define LF '\r'

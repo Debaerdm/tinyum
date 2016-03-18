@@ -6,9 +6,10 @@
 #include <sys/socket.h>
 #include <sys/wait.h>
 #include <setjmp.h>
-#include "signals.h"
-#include "socket.h"
-#include "stats.h"
+#include "../include/signals.h"
+#include "../include/socket.h"
+#include "../include/stats.h"
+
 
 int main(void)
 {
@@ -16,13 +17,9 @@ int main(void)
   if ((socket_server = create_server(8080)) == -1) return EXIT_FAILURE;
 
   initialize_signals();
+  web_stats *stats = get_stats();
+  init_stats();
   
-  web_stats *stats;
-  if(!init_stats()){
-    return EXIT_FAILURE;
-  }
-  stats = get_stats();
-
   for (;;) {
     if ((socket_client = accept(socket_server, NULL, NULL)) == -1) {
       perror("Connection refused");
@@ -45,7 +42,7 @@ int main(void)
       return EXIT_FAILURE;
     }
     if(pid == 0){
-      if(client(tinyum, stats, socket_client) == 1){
+      if(client(tinyum, socket_client) == 1){
         return EXIT_FAILURE;
       }
       return EXIT_SUCCESS;

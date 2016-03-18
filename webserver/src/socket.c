@@ -20,7 +20,7 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include "socket.h"
+#include "../include/socket.h"
 
 /*
  * create_server - start listen socket on given port

@@ -14,6 +14,6 @@
 #include <setjmp.h>
 #include "stats.h"
 
-int client(FILE *tinyum, web_stats *stats, int socket_client);
+int client(FILE *tinyum, int socket_client);
 int create_server(int port);
 #endif

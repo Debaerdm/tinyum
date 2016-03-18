@@ -5,9 +5,9 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/mman.h>
-#include "stats.h"
-#include "http_status.h"
-#include "config_url.h"
+#include "../include/stats.h"
+#include "../include/http_status.h"
+#include "../include/config_url.h"
 
 static web_stats stats;
 

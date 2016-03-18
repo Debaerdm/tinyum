@@ -1,26 +1,31 @@
 CC=gcc
-LD=gcc
+LD=gcc -o
+OBJDIR=bin
+SRCDIR=src
+INCDIR=include
+EXE=tinyum
+CFILES:=$(wildcard $(SRCDIR)/*.c)
+INCLUDES:=$(wildcard $(INCDIR)/*.h)
+OBJECTS:=$(CFILES:$(SRCDIR)/%.c=$(OBJDIR)/%.o)
 CFLAGS=-Wall -Wextra -W -Werror -Wwrite-strings -Wshadow -Wstrict-overflow -fno-strict-aliasing -Wno-missing-field-initializers -O2 -g
 LDFLAGS=
-EXE=tinyum
-HEADERS=$(wildcard *.h)
-CFILES=$(wildcard *.c)
-OBJS=$(CFILES:.c=.o)
 
 .PHONY:all clean mrproper
 
 all: $(EXE)
 
-$(EXE): $(OBJS)
-	$(LD) $^ $(LDFLAGS) -o $@
+$(EXE): $(OBJECTS)
+	$(LD) $@ $(LSFLAGS) $(OBJECTS)
+	@echo "Linking complete!"
 
-makefile.dep: $(CFILES) $(HEADERS)
-	$(CC) -MM $(CFILES) > $@
+$(OBJECTS): $(OBJDIR)/%.o : $(SRCDIR)/%.c
+	$(CC) $(CFLAGS) -c $< -o $@
+	@echo "Compiled "$<" successfully!"
 
 clean:
-	$(RM) $(OBJS) makefile.dep
+	$(rm) $(OBJECTS)
+	@echo "Cleanup complete!"
 
 mrproper: clean
-	$(RM) $(EXE)
-
-include makefile.dep
+	$(rm) $(EXE)
+	@echo "Executable removed!"
