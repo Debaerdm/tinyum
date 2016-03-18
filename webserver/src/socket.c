@@ -22,36 +22,31 @@
 
 #include "../include/socket.h"
 
+#define handle_error(msg) \
+	do { perror(msg); exit(EXIT_FAILURE); } while (0)
+
 /*
  * create_server - start listen socket on given port
  */
 int create_server(int port)
 {
   int socket_server;
-  if ((socket_server = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
-    perror("Socket error");
-    return EXIT_FAILURE;
-  }
+  if ((socket_server = socket(AF_INET, SOCK_STREAM, 0)) == -1) 
+	handle_error("Socket error");
 
   int optval = 1;
-  if (setsockopt(socket_server, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(int)) == -1) {
-    perror("Can not set SO_REUSEADDR option");
-    return EXIT_FAILURE;
-  }
+  if (setsockopt(socket_server, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(int)) == -1) 
+	handle_error("Can nit set SO_REUSEADDR option");
 
   struct sockaddr_in saddr;
   saddr.sin_family = AF_INET;
   saddr.sin_port = htons(port);
   saddr.sin_addr.s_addr = INADDR_ANY;
-  if (bind(socket_server, (struct sockaddr *) &saddr, sizeof(saddr)) == -1) {
-    perror("Bind error");
-    return EXIT_FAILURE;
-  }
+  if (bind(socket_server, (struct sockaddr *) &saddr, sizeof(saddr)) == -1) 
+	handle_error("Bind error");
 
-  if (listen(socket_server, 10) == -1) {
-    perror("Listen error");
-    return EXIT_FAILURE;
-  }
+  if (listen(socket_server, 10) == -1) 
+	handle_error("Listen error");
     
   return socket_server;
 }

@@ -25,6 +25,9 @@
 #include <signal.h> 
 #include <sys/wait.h>
 
+#define handle_error(msg) \
+	do { perror(msg); exit(EXIT_FAILURE); } while (0)
+
 /*
  * handler - catch signal and wait after child
  */
@@ -48,14 +51,10 @@ void initialize_signals(void)
   sigemptyset(&sa.sa_mask);
   sa.sa_flags = SA_RESTART;
 
-  if (sigaction(SIGCHLD, &sa, NULL) == -1) {
-    perror("sigaction");
-    exit(EXIT_FAILURE);
-  }
+  if (sigaction(SIGCHLD, &sa, NULL) == -1) 
+    handle_error("sigaction");
 
-  if (signal(SIGPIPE, SIG_IGN) == SIG_ERR) {
-    perror("signal");
-    exit(EXIT_FAILURE);
-  }
+  if (signal(SIGPIPE, SIG_IGN) == SIG_ERR) 
+	handle_error("signal");
 }
 

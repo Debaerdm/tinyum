@@ -11,6 +11,9 @@
 #define IN 1
 #define BUFFER_SIZE 1024
 
+#define handle_error(msg) \
+	do { perror(msg); exit(EXIT_FAILURE); } while (0)
+
 /*
  * Keeps the term that we have treated
  */
