@@ -36,6 +36,9 @@
 #define BUFFER_SIZE 1024
 #define WWW_DIR "/public_html"
 
+#define handle_error(msg) \
+	do { perror(msg); exit(EXIT_FAILURE); } while (0)
+
 int client(FILE *tinyum, int socket_client)
 {
     web_stats *stats = get_stats();

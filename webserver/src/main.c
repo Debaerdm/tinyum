@@ -10,6 +10,8 @@
 #include "../include/socket.h"
 #include "../include/stats.h"
 
+#define handle_error(msg) \
+	do { perror(msg); exit(EXIT_FAILURE); } while (0)
 
 int main(void)
 {
@@ -21,30 +23,25 @@ int main(void)
   init_stats();
   
   for (;;) {
-    if ((socket_client = accept(socket_server, NULL, NULL)) == -1) {
-      perror("Connection refused");
-      return EXIT_FAILURE;
-    }
+    if ((socket_client = accept(socket_server, NULL, NULL)) == -1) 
+	handle_error("accept");    
+
 
     puts("Client connected");
     stats->served_connections++;
 	
     FILE *tinyum;
-    if ((tinyum = fdopen(socket_client, "w+")) == NULL){
-      perror("fdopen");
-      return EXIT_FAILURE;
-    }
+    if ((tinyum = fdopen(socket_client, "w+")) == NULL)
+	handle_error("fdopen");
 
     pid_t pid;
     if ((pid = fork()) == -1) {
-      perror("fork");
-      close(pid);
-      return EXIT_FAILURE;
+      	close(pid);
+	handle_error("fork");
     }
     if(pid == 0){
-      if(client(tinyum, socket_client) == 1){
-        return EXIT_FAILURE;
-      }
+      if(client(tinyum, socket_client) == 1)
+	handle_error("Communication");
       return EXIT_SUCCESS;
     }
     else {
