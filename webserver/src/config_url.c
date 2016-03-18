@@ -10,6 +10,9 @@
 
 #define BUFFER_SIZE 1024
 
+#define handle_error(msg) \
+	do { perror(msg); exit(EXIT_FAILURE); } while (0)
+
 /*
  *  rewrite_url - rewrite url if is "/"
  */
@@ -36,10 +39,8 @@ int check_and_open(const char *url, const char *document_root){
   sprintf(path, "%s%s", document_root, url);
 
   struct stat conf;
-  if (stat(path, &conf) == -1) {
-    perror(path);
-    return EXIT_FAILURE;
-  }
+  if (stat(path, &conf) == -1) 
+	handle_error(path);
 
   if (S_ISREG(conf.st_mode))
     return open(path, O_RDONLY);
@@ -53,10 +54,8 @@ int check_and_open(const char *url, const char *document_root){
 int get_file_size(int fildes) {
   struct stat file_stat;
 
-  if (fstat(fildes, &file_stat) < 0) {
-    perror("fstat");
-    return EXIT_FAILURE;
-  }
+  if (fstat(fildes, &file_stat) < 0) 
+	handle_error("fstat");
 
   return file_stat.st_size;
 }
@@ -69,10 +68,8 @@ int copy(int in, int out) {
   char tamp[BUFFER_SIZE];
 
   while ((n = read(in, tamp, BUFFER_SIZE)) > 0) {
-    if (write(out, tamp, n) != n) {
-      perror("write");
-      return EXIT_FAILURE;
-    }
+    if (write(out, tamp, n) != n) 
+	handle_error("write");
   }
   return EXIT_SUCCESS;
 }
