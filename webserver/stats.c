@@ -4,6 +4,7 @@
 #include <sys/types.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <sys/mman.h>
 #include "stats.h"
 #include "http_status.h"
 #include "config_url.h"
@@ -46,7 +47,14 @@ void send_stats(FILE *client, char *uri){
   }
 }
 
-int32_t init_stats(void){
+int init_stats(void){
+  char *addr;
+ 
+  if ((addr = mmap(NULL, sizeof(stats), PROT_READ, MAP_SHARED | MAP_ANONYMOUS, -1, 0)) == MAP_FAILED) {
+	perror("mmap");
+	return EXIT_FAILURE;
+  }
+
   stats.served_connections = stats.served_requests = stats.ok_200 = stats.ko_400 = stats.ko_403 = stats.ko_404 = stats.ko_405 = 0;
   return stats.served_connections == 0 && stats.served_requests == 0 && stats.ok_200 == 0 &&  stats.ko_400 == 0 && stats.ko_403 == 0 && stats.ko_404 == 0 &&  stats.ko_405 == 0;
 }
