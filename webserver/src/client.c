@@ -56,13 +56,10 @@ int client(FILE *tinyum, web_stats *stats, int socket_client)
         
     if (request) {
       send_response(tinyum, 400, "Bad Request\r\n");
-      stats->ko_400++;
     } else if (req.m == HTTP_INVALID) {
       send_response(tinyum, 405, "Method Not Allowed\r\n");
-      stats->ko_405++;
     } else if (url_valid(req.uri) == 1) {
       send_response(tinyum, 403, "Forbidden\r\n");
-      stats->ko_403++;
       return EXIT_FAILURE;
     } else if (strcmp(req.uri, "/stats") == 0 || strcmp(req.uri, "/stats.html") == 0){
       if(strcmp(req.uri, "/stats") == 0){
@@ -81,10 +78,8 @@ int client(FILE *tinyum, web_stats *stats, int socket_client)
           copy(not_found_file, socket_client);
         }
         close(not_found_file);
-        stats->ko_404++;
         return EXIT_FAILURE;
       } else {
-        stats->ok_200++;
         send_status(tinyum, 200);
         fprintf(tinyum, "Connection: close\r\nContent-Type: %s\r\nContent-length: %d\r\n\r\n", application_type(req.uri), get_file_size(fildes));
         fflush(tinyum);
