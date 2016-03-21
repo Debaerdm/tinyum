@@ -8,7 +8,7 @@ CFILES:=$(wildcard $(SRCDIR)/*.c)
 INCLUDES:=$(wildcard $(INCDIR)/*.h)
 OBJECTS:=$(CFILES:$(SRCDIR)/%.c=$(OBJDIR)/%.o)
 CFLAGS=-Wall -Wextra -W -Werror -pedantic -Wwrite-strings -Wshadow -Wstrict-overflow -fno-strict-aliasing -Wno-missing-field-initializers -O2 -g
-LDFLAGS=
+LDFLAGS=-lpthread
 MKDIR_P=mkdir -p
 
 .PHONY:all clean mrproper directories
@@ -16,11 +16,11 @@ MKDIR_P=mkdir -p
 all: directories $(EXE)
 
 $(EXE): $(OBJECTS)
-	$(LD) $@ $(LSFLAGS) $(OBJECTS)
+	$(LD) $@ $(LDFLAGS) $(OBJECTS)
 	@echo "Linking complete!"
 
 $(OBJECTS): $(OBJDIR)/%.o : $(SRCDIR)/%.c
-	$(CC) $(CFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) -c $< -o  $@
 	@echo "Compiled "$<" successfully!"
 
 directories: $(OBJDIR)
