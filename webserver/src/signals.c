@@ -36,7 +36,7 @@ void handler(int sig)
   pid_t pid;
   int status;
     
-  if ((pid = waitpid(-1, &status, WNOHANG)) > 0)
+  while ((pid = waitpid(-1, &status, WNOHANG)) > 0)
     printf("Signal %d received\n", sig);
 }
 
