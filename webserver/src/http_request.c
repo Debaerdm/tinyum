@@ -90,7 +90,7 @@ void skip_headers(FILE *client){
 int read_http_header(const char* line, http_request *r)
 {
     int pos, last = strlen(line), current_state = s_start;
-    char ch;
+    char ch = 0x00;
     char s[strlen(line)];
     memset(s, 0, strlen(line));
 
