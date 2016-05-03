@@ -1,5 +1,5 @@
-#ifndef __STATS_H__
-#define __STATS_H__
+#ifndef STATS_H
+#define STATS_H
 
 #include <string.h>
 
@@ -18,4 +18,5 @@ void replace_variable(FILE *client, char* uri);
 void send_stats(FILE *client, char *uri);
 int init_stats(void);
 web_stats *get_stats(void);
+
 #endif

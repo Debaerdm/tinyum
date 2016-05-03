@@ -1,5 +1,5 @@
-#ifndef __SOCKET_H__
-#define __SOCKET_H__
+#ifndef SOCKET_H
+#define SOCKET_H
 
 #include <stdio.h>
 #include <string.h>
@@ -16,4 +16,5 @@
 
 int client(FILE *tinyum, int socket_client);
 int create_server(int port);
+
 #endif
