@@ -7,7 +7,8 @@
  */
 
 /**
- * rewrite_url - check if the URL is equals to "/".
+ * @fn const char *rewrite_url(char *url)
+ * @brief check if the URL is equals to "/".
  *
  * @param url - The URL needs to be analyzed.
  *
@@ -19,7 +20,8 @@
 const char  *rewrite_url(char *url);
 
 /**
- * check_and_open - check if file given by url exsit and open it.
+ * @fn int check_and_open(const char *url, const char *document_root) 
+ * @brief check if file given by url exsit and open it.
  *
  * @param url - The path of the file request.
  * @param document_root - The path which the project is located.
@@ -30,16 +32,18 @@ const char  *rewrite_url(char *url);
 int check_and_open(const char *url, const char *document_root);
 
 /**
- * get_file_size - gives the size of the file in bytes.
+ * @fn int get_file_size(int fildes)
+ * @brief gives the size of the file in bytes.
  *
- * @param fildes - The file descriptor of the file whose size is desired.
+ * @param fd - The file descriptor of the file whose size is desired.
  *
  * @return On success, the size in bytes is returned. On error, 1 is returned.
  */
-int get_file_size(int fildes);
+int get_file_size(int fd);
 
 /**
- * copy - read into file descriptor in and rewrite into out.
+ * @fn int copy(int in, int out) 
+ * @brief read into file descriptor in and rewrite into out.
  *
  * @param in - The in file descriptor.
  * @param out - The out file descriptor.
@@ -50,7 +54,8 @@ int get_file_size(int fildes);
 int copy(int in, int out);
 
 /**
- * application_types - gives the type mines of file.
+ * @fn const char *application_type(const char *url)
+ * @brief gives the type mines of file.
  *
  * @param url - The path to file.
  *
@@ -59,7 +64,8 @@ int copy(int in, int out);
 const char *application_type(const char *url);
 
 /**
- * url_valid - avoid url contains "..".
+ * @fn int url_valid(char *url)
+ * @brief avoid url contains "..".
  *
  * @param url - The URL to check up.
  *

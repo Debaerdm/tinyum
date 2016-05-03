@@ -2,12 +2,19 @@
 #define SIGNALS_H
 
 /**
- * initialize_signals - fill signaction struct with current information.
+ * @file
+ * @brief signal for kill child if this are a zombie
+ */
+
+/**
+ * @fn void initialize_signals(void)
+ * @brief fill signaction struct with current information.
  */
 void initialize_signals(void);
 
 /**
- * handler - wait after dead chilld/
+ * @fn void handler(int sig)
+ * @brief wait after dead chilld/
  */
 void handler(int sig);
 

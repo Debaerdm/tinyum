@@ -21,7 +21,8 @@
 
 
 /**
- * client - connected in the server and manipulate request from input 
+ * @fn int client(FILE *tinyum, int socket_client)
+ * @brief connected in the server and manipulate request from input 
  *
  * @param tinyum - The descriptor of file for input information like request
  * @param socket_client - The client connected actually into the server
@@ -31,7 +32,8 @@
 int client(FILE *tinyum, int socket_client);
 
 /**
- * create_server - make the server in the localhost with the port, 
+ * @fn int create_server(int port)
+ * @brief make the server in the localhost with the port, 
  * once instance of this is only used
  *
  * @param port - The port of server listen for many connection
