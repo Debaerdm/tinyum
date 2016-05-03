@@ -3,6 +3,7 @@
  * Client for connecting in the socket server
  *
  * Copyright (C) 2016 Mathieu DE BAERDEMAEKER mathieu.debaerdemaeker@gmail.com
+ * Copyright (C) 2016 Clément BOIN clem.boin@gmail.com
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
