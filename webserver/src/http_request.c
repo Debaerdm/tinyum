@@ -91,11 +91,12 @@ void skip_headers(FILE *client)
  */
 int read_http_header(const char* line, http_request *r)
 {
-    int pos, last = strlen(line), current_state = s_start;
-    char ch = 0x00;
-    char s[strlen(line)];
+    int length = strlen(line);
+    int pos, last = length, current_state = s_start;
+    char ch = 'a';
+    char s[length];
 
-    memset(s, 0, strlen(line));
+    memset(s, 0, length);
 
     for (pos = 0; pos < last; ++pos) {
         ch = line[pos];
@@ -196,7 +197,7 @@ int read_http_header(const char* line, http_request *r)
                 current_state = s_http_correct;
                 break;
             } else {
-                append(s, strlen(line), ch);
+                append(s, length, ch);
             }
 
             break;
@@ -280,7 +281,7 @@ int read_http_header(const char* line, http_request *r)
                 return EXIT_FAILURE;
             }
 
-            r->major_version = atoi(&ch);
+            r->major_version = strtol(&ch, NULL, 1);
             current_state = s_http_major_version;
 
             break;
@@ -297,7 +298,7 @@ int read_http_header(const char* line, http_request *r)
                 return EXIT_FAILURE;
             }
 
-            r->major_version = r->major_version * 10 + atoi(&ch);
+            r->major_version = r->major_version * 10 + strtol(&ch, NULL, 1);
             break;
 
         case s_http_first_minor_version:
@@ -307,7 +308,7 @@ int read_http_header(const char* line, http_request *r)
                 return EXIT_FAILURE;
             }
 
-            r->minor_version = atoi(&ch);
+            r->minor_version = strtol(&ch, NULL, 1);
             current_state = s_http_minor_version;
             break;
 
