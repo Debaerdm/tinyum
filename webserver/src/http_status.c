@@ -1,7 +1,8 @@
 /*
- * webserver/http_status.c
+ * http_status.c
  * Client for connecting in the socket server
  *
+ * Copyright (C) 2016 Clément Boin clem.boin@gmail.com
  * Copyright (C) 2016 Mathieu DE BAERDEMAEKER mathieu.debaerdemaeker@gmail.com
  *
  * This program is free software; you can redistribute it and/or modify

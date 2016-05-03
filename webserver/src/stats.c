@@ -1,7 +1,7 @@
 /*
 * stats.c
 *
-* Copyright (C) 2016 Clément Boin clem.boin@gmail.com
+* Copyright (C) 2016 Mathieu DE BAERDEMAEKER mathieu.debaerdemaeker@gmail.com
 *
 * This program is free software; you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by

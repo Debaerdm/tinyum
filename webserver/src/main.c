@@ -1,6 +1,7 @@
 /*
 * main.c
 *
+* Copyright (C) 2016 Clément DE BAERDEMAEKER mathieu.debaerdemaeker@gmail.com
 * Copyright (C) 2016 Clément Boin clem.boin@gmail.com
 *
 * This program is free software; you can redistribute it and/or modify

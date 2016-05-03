@@ -1,5 +1,5 @@
 /*
- * webserver/main.c
+ * client.c
  * Client for connecting in the socket server
  *
  * Copyright (C) 2016 Mathieu DE BAERDEMAEKER mathieu.debaerdemaeker@gmail.com
