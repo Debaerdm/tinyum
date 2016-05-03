@@ -24,7 +24,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <sys/types.h> 
+#include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/wait.h>
 #include <setjmp.h>
@@ -47,52 +47,60 @@ int client(FILE *tinyum, int socket_client)
     /* Clean the buffer stream */
     memset(buf, 0, sizeof(buf));
     http_request req;
-	    
+
     fgets_or_exit(buf, sizeof(buf), tinyum);
-	    
+
     int request;
     request = read_http_header(buf, &req);
     ++stats->served_requests;
     skip_headers(tinyum);
-      
+
     char *path = getenv("HOME");
     strcat(path, WWW_DIR);
-        
+
     if (request) {
-      send_response(tinyum, 400, "Bad Request\r\n");
+        send_response(tinyum, 400, "Bad Request\r\n");
     } else if (req.m == HTTP_INVALID) {
-      send_response(tinyum, 405, "Method Not Allowed\r\n");
+        send_response(tinyum, 405, "Method Not Allowed\r\n");
     } else if (url_valid(req.uri) == 1) {
-      send_response(tinyum, 403, "Forbidden\r\n");
-      return EXIT_FAILURE;
-    } else if (strcmp(req.uri, "/stats") == 0 || strcmp(req.uri, "/stats.html") == 0 /*strstr(req.uri, "/stats") != NULL*/){
-      if(strcmp(req.uri, "/stats") == 0){
-        strcat(req.uri, ".html");
-        }
-      strcat(path, req.uri);
-      send_stats(tinyum, path);
-    } else {
-      int fildes;
-      if ((fildes = check_and_open(req.uri, path)) == 1) {
-        send_status(tinyum, 404);
-        int not_found_file;
-        if((not_found_file = check_and_open("/404.html", path)) != 1){
-          fprintf(tinyum, "Connection: close\r\nContent-Type: %s\r\nContent-length: %d\r\n\r\n", application_type("/404.html"), get_file_size(not_found_file));
-          fflush(tinyum);
-          copy(not_found_file, socket_client);
-        }
-        close(not_found_file);
+        send_response(tinyum, 403, "Forbidden\r\n");
         return EXIT_FAILURE;
-      } else {
-        send_status(tinyum, 200);
-        fprintf(tinyum, "Connection: close\r\nContent-Type: %s\r\nContent-length: %d\r\n\r\n", application_type(req.uri), get_file_size(fildes));
-        fflush(tinyum);
-        copy(fildes, socket_client);
-      }
-      close(fildes);
+    } else if (strcmp(req.uri, "/stats") == 0 || strcmp(req.uri, "/stats.html") == 0) {
+        if(strcmp(req.uri, "/stats") == 0) {
+            strcat(req.uri, ".html");
+        }
+        strcat(path, req.uri);
+        send_stats(tinyum, path);
+    } else {
+        int fildes;
+
+        if ((fildes = check_and_open(req.uri, path)) == 1) {
+            send_status(tinyum, 404);
+
+            int not_found_file;
+
+            if ((not_found_file = check_and_open("/404.html", path)) != 1) {
+                fprintf(tinyum, "Connection: close\r\nContent-Type: %s\r\nContent-length: %d\r\n\r\n", application_type("/404.html"), get_file_size(not_found_file));
+                fflush(tinyum);
+                copy(not_found_file, socket_client);
+            }
+
+            close(not_found_file);
+
+            return EXIT_FAILURE;
+        } else {
+            send_status(tinyum, 200);
+            fprintf(tinyum, "Connection: close\r\nContent-Type: %s\r\nContent-length: %d\r\n\r\n", application_type(req.uri), get_file_size(fildes));
+            fflush(tinyum);
+            copy(fildes, socket_client);
+        }
+
+        close(fildes);
     }
+
     memset(buf, 0, sizeof(buf));
     fclose(tinyum);
     close(socket_client);
-    return EXIT_SUCCESS;      
+
+    return EXIT_SUCCESS;
 }
