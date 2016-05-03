@@ -14,6 +14,23 @@ You can clone the project with Git by running:
 git clone https://github.com/cboin/tinyum.git
 ```
 
+## Build
+```
+make
+```
+
+## Run
+
+copy the public_html directory:
+```
+cp tinyum/public_html $HOME
+```
+
+And run:
+```
+./tinyum
+```
+
 ## Contact
 @boinc
 @Debaerdm
