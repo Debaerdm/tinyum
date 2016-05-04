@@ -1,6 +1,7 @@
 /*
 * http_request.c
-*
+* 
+* Copyright (C) 2016 Mathieu DE BAERDEMAEKER mathieu.debaerdemaeker@gmail.com
 * Copyright (C) 2016 Clément Boin clem.boin@gmail.com
 *
 * This program is free software; you can redistribute it and/or modify
@@ -26,8 +27,8 @@
 #include "../include/http_request.h"
 #include "../include/config_url.h"
 
-#define CR '\n'
-#define LF '\r'
+#define LF '\n'
+#define CR '\r'
 #define OUT 0
 #define IN 1
 #define BUFFER_SIZE 1024

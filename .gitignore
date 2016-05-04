@@ -92,4 +92,5 @@ CMakeScripts
 cmake_install.cmake
 install_manifest.txt
 
-
+# Doxygen
+/websever/doc/html/

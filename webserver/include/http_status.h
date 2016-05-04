@@ -2,7 +2,13 @@
 #define HTTP_STATUS_H
 
 /**
- * reason_phrase - return specifiy sentence by given code.
+ * @file
+ * @brief make a status and sentence with the code http
+ */
+
+/**
+ * @fn const char *reason_phrase(int code)
+ * @brief return specifiy sentence by given code.
  *
  * @param code - The HTTP code
  *
@@ -12,7 +18,8 @@
 const char *reason_phrase(int code);
 
 /**
- * send_status - send status to client.
+ * @fn void send_status(FILE *client, int code) 
+ * @brief send status to client.
  *
  * @param client - The input stream of the client.
  * @param code - The code to be send to the client.
@@ -21,11 +28,12 @@ const char *reason_phrase(int code);
 void send_status(FILE *client, int code);
 
 /**
- * send_response - send reponse to the client/
+ * @fn void send_response(FILE *client, int code, const char *message_body) 
+ * @brief send reponse to the client/
  *
  * @param client - the input stream of the client.
  * @param code - The code to be send to the client.
- * @param message - The message to be send to the client.
+ * @param message_body - The message to be send to the client.
  *
  */
 void send_response(FILE *client, int code, const char *message_body);

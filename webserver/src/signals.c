@@ -1,5 +1,5 @@
 /*
- * webserver/signals.c
+ * signals.c
  * Configuration of signal client
  *
  * Copyright (C) 2016 Mathieu DE BAERDEMAEKER  mathieu.debaerdemaeker@gmail.com

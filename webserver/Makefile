@@ -2,6 +2,8 @@ CC=gcc
 LD=gcc -o
 OBJDIR=bin
 SRCDIR=src
+DOXYFILE=Doxyfile
+DOCDIR=doc
 INCDIR=include
 EXE=tinyum
 CFILES:=$(wildcard $(SRCDIR)/*.c)
@@ -11,7 +13,7 @@ CFLAGS=-Wall -Wextra -W -Werror -Wwrite-strings -Wshadow -Wstrict-overflow -fno-
 LDFLAGS=-lpthread
 MKDIR_P=mkdir -p
 
-.PHONY:all clean mrproper directories
+.PHONY:all clean mrproper directories doc
 
 all: directories $(EXE)
 
@@ -22,6 +24,11 @@ $(EXE): $(OBJECTS)
 $(OBJECTS): $(OBJDIR)/%.o : $(SRCDIR)/%.c
 	$(CC) $(CFLAGS) -c $< -o  $@
 	@echo "Compiled "$<" successfully!"
+
+doc: 
+	$(MKDIR_P) $(DOCDIR)
+	doxygen $(DOXYFILE)
+	@echo "Generate doc !"
 
 directories: $(OBJDIR)
 

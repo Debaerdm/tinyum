@@ -4,9 +4,26 @@
 #include <string.h>
 #include <ctype.h>
 
-#define CR '\n'
-#define LF '\r'
+/**
+ * @file
+ * @brief Http method for parse the header in the content of request 
+ */
+
+/*! @def LF
+ *  @brief A macro for Line Feed 
+ */
+#define LF '\n'
+ /*! @def CR
+  *  @brief A macro for Carriage returns
+  */
+#define CR '\r'
+ /*! @def OUT
+  *  @brief A macro for stdout
+  */
 #define OUT 0
+ /*! @def IN
+  *  @brief A macro for stdin
+  */
 #define IN 1
 
 /**
@@ -26,17 +43,18 @@ enum http_method {
 
 /* Request-Line = Method SP Request-URI SP HTTP-Version CRLF */
 /**
- * Typedef to define how to store HTTP informations.
+ * @brief To define how to store HTTP informations.
  */
 typedef struct {
-  enum http_method m;
-  int major_version;
-  int minor_version;
-  char uri[512];
-} http_request;
+  enum http_method m; ///< The set of common methods for HTTP/1.1
+  int major_version; ///< The version of max value of HTTP/1.1
+  int minor_version; ///< The version of minir value of HTTP/1.1
+  char uri[512]; ///< The uri used for path to navigate into the server
+} http_request; ///< To define how to store HTTP informations.
 
 /**
- * words - count the number of words in a sentence.
+ * @fn int words(const char* s) 
+ * @brief count the number of words in a sentence.
  *
  * @param s - the sentence that we want to count words.
  *
@@ -45,7 +63,8 @@ typedef struct {
 int words(const char* s);
 
 /**
- * append - appends the string representation if the char argument to this
+ * @fn int append(char *s, size_t, char c) 
+ * @ brief appends the string representation if the char argument to this
  * sequence.
  *
  * @param s - the sentence which must be added a character.
@@ -57,7 +76,8 @@ int words(const char* s);
 int append(char *s, size_t size, char c);
 
 /**
- * fgets_or_exit - input of strings or exit.
+ * @fn char fgets_or_exit(char *buf, int size, FILE *stream)
+ * @brief input of strings or exit.
  *
  * @param buf - The buffer that'll contain the characters.
  * @param size - The numbers of characters to read.
@@ -69,23 +89,26 @@ int append(char *s, size_t size, char c);
 char *fgets_or_exit(char *buf, int size, FILE *stream);
 
 /**
- * skip_headers - avoid sequence of line in stream.
+ * @fn void skip_headers(FILE *client)
+ * @brief avoid sequence of line in stream.
  *
  * @param client - The stream to jump at the end.
  */
 void skip_headers(FILE *client);
 
 /**
- * get_file_size - gives the size of the file in bytes.
+ * @fn int get_file_size(int fd) 
+ * @brief gives the size of the file in bytes.
  *
- * @param fildes - The file descriptor of the file whose size is desired.
+ * @param fd - The file descriptor of the file whose size is desired.
  *
- * @return On successn the size in bytes is returned. On errorn 1 is returned.
+ * @return On successn the size in bytes is returned. On error 1 is returned.
  */
 int get_file_size(int fd);
 
 /**
- * read_http_header - extract informations from lines.
+ * @fn int read_http_header(const char* line, http_request* request)
+ * @brief extract informations from lines.
  *
  * @param line - The line to be analyzed.
  * @param request - The http_request struct to store informations.
@@ -93,6 +116,6 @@ int get_file_size(int fd);
  * @return On success the read_http_header function return 1, Otherwise 0 is
  * returned.
  */
-int read_http_header(const char*, http_request *);
+int read_http_header(const char* line, http_request* request);
 
 #endif
